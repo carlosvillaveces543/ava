@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0d0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="AVA — Sistema de gestión para barberías" />
+  <title>AVA · Gestión para Barberías</title>
+  <style>
+    :root{
+      --bg:#0f0d0b;--bg2:#17130f;--panel:#1d1813;--panel2:#251f18;--soft:#30271e;
+      --gold:#d6ad5b;--gold2:#f1d18c;--leather:#8b5e3c;--text:#f8f3e8;--muted:#bfb4a3;
+      --success:#48c78e;--danger:#ff6b6b;--warning:#f7b84b;--info:#66b3ff;--line:#3b3025;
+      --shadow:0 16px 45px rgba(0,0,0,.32);--r:18px;--r2:12px;
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+    *{box-sizing:border-box} html{background:var(--bg);color-scheme:dark} body{margin:0;min-height:100vh;background:
+      radial-gradient(circle at 20% -10%,rgba(214,173,91,.12),transparent 34%),
+      linear-gradient(145deg,var(--bg),#100e0c 45%,#15110e);color:var(--text);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    button,input,select,textarea{font:inherit} button{cursor:pointer} a{color:inherit}.hidden{display:none!important}
+    .app-loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:9999}
+    .loader{width:48px;height:48px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--gold);animation:spin .85s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .auth-shell{min-height:100vh;display:grid;place-items:center;padding:22px}.auth-card{width:min(440px,100%);background:linear-gradient(180deg,rgba(37,31,24,.98),rgba(24,20,16,.98));border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)}
+    .brand{display:flex;align-items:center;gap:12px}.brand-mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold2),var(--leather));color:#21180d;font-weight:900;font-size:23px;box-shadow:0 10px 28px rgba(214,173,91,.2)}
+    .brand h1{font-family:Georgia,serif;letter-spacing:.12em;margin:0;font-size:23px}.brand small{display:block;color:var(--muted);letter-spacing:.04em}.auth-card h2{margin:28px 0 6px}.auth-card p{color:var(--muted);margin:0 0 20px}
+    .field{display:grid;gap:7px;margin-bottom:14px}.field>label,.label{font-weight:700;font-size:13px;color:#e8decd}.field small{color:var(--muted)}
+    input,select,textarea{width:100%;border:1px solid var(--line);background:#14110e;color:var(--text);border-radius:12px;padding:12px 13px;outline:none;transition:.2s;border-color:.2s}textarea{min-height:90px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(214,173,91,.12)}input::placeholder,textarea::placeholder{color:#786f64}
+    input[type="checkbox"],input[type="radio"]{width:auto;accent-color:var(--gold)}
+    .btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s;min-height:43px}
+    .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}.btn-primary{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#251a0a}.btn-secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}.btn-danger{background:rgba(255,107,107,.14);color:#ff9d9d;border:1px solid rgba(255,107,107,.25)}.btn-success{background:rgba(72,199,142,.15);color:#8ce5bc;border:1px solid rgba(72,199,142,.25)}.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}.btn-sm{padding:7px 10px;min-height:34px;font-size:13px}.btn-block{width:100%}
+    .auth-alt{margin-top:14px;text-align:center;color:var(--muted)}.link-btn{border:0;background:none;color:var(--gold2);font-weight:800;padding:4px}
+    .shell{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:278px;background:rgba(20,17,14,.97);border-right:1px solid var(--line);z-index:100;display:flex;flex-direction:column;transform:translateX(-105%);transition:.25s;box-shadow:var(--shadow)}.sidebar.open{transform:none}.side-head{padding:19px;border-bottom:1px solid var(--line)}.side-user{margin-top:14px;padding:12px;border-radius:13px;background:var(--panel);display:flex;gap:10px;align-items:center}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--gold2);font-weight:900}.side-user b,.side-user small{display:block}.side-user small{color:var(--muted);font-size:12px}.nav{padding:10px;overflow:auto;flex:1}.nav-item{width:100%;border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:12px;display:flex;align-items:center;gap:11px;text-align:left;margin:2px 0;font-weight:700}.nav-item:hover{background:var(--panel);color:var(--text)}.nav-item.active{background:linear-gradient(90deg,rgba(214,173,91,.18),rgba(214,173,91,.05));color:var(--gold2);box-shadow:inset 3px 0 var(--gold)}.nav-item .ico{width:25px;text-align:center;font-size:18px}.badge{min-width:20px;height:20px;border-radius:999px;display:inline-grid;place-items:center;padding:0 6px;background:var(--danger);color:white;font-size:11px;margin-left:auto}.side-foot{padding:12px;border-top:1px solid var(--line)}
+    .topbar{position:sticky;top:0;z-index:50;height:64px;padding:10px 14px;display:flex;align-items:center;gap:12px;background:rgba(15,13,11,.84);backdrop-filter:blur(18px);border-bottom:1px solid rgba(59,48,37,.7)}.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px;display:grid;place-items:center}.top-title{min-width:0}.top-title h2{font-family:Georgia,serif;margin:0;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top-title small{color:var(--muted)}.top-actions{margin-left:auto;display:flex;gap:8px}.connection-dot{width:10px;height:10px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(72,199,142,.1)}.connection-dot.off{background:var(--danger);box-shadow:0 0 0 4px rgba(255,107,107,.1)}
+    main{padding:15px 14px calc(88px + var(--safe-bottom));max-width:1480px;margin:auto}.section{animation:fade .18s ease}@keyframes fade{from{opacity:.2;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .page-head{display:flex;align-items:flex-start;gap:12px;margin:3px 0 16px}.page-head h2{font-family:Georgia,serif;margin:0 0 3px;font-size:25px}.page-head p{color:var(--muted);margin:0}.page-head .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+    .grid{display:grid;gap:14px}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.card{background:linear-gradient(180deg,rgba(37,31,24,.94),rgba(28,23,18,.94));border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:0 10px 26px rgba(0,0,0,.13)}.card h3{font-family:Georgia,serif;margin:0 0 13px;font-size:18px}.card h4{margin:0 0 10px}.card-sub{color:var(--muted);font-size:13px;margin-top:-8px;margin-bottom:14px}.stat{padding:17px;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(214,173,91,.08);right:-25px;top:-25px}.stat .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.stat .v{font-size:25px;font-weight:900;margin-top:5px}.stat .hint{color:var(--muted);font-size:12px;margin-top:3px}
+    .row{display:flex;gap:10px;align-items:center}.row-wrap{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.row-wrap>.field{flex:1 1 160px;margin:0}.stack{display:grid;gap:10px}.separator{height:1px;background:var(--line);margin:16px 0}.muted{color:var(--muted)}.gold{color:var(--gold2)}.danger{color:#ff9d9d}.success{color:#8ce5bc}.right{text-align:right}.center{text-align:center}.nowrap{white-space:nowrap}.w-auto{width:auto}.mt{margin-top:14px}.mb{margin-bottom:14px}.m0{margin:0}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:720px}.table th,.table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}.table th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#17130f;position:sticky;top:0}.table tr:last-child td{border-bottom:0}.table tr:hover td{background:rgba(214,173,91,.025)}.responsive-list{display:grid;gap:10px}.list-card{border:1px solid var(--line);background:#17130f;border-radius:14px;padding:13px}.list-card .list-head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}.list-card h4{margin:0}.list-card p{margin:4px 0 0;color:var(--muted)}.list-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+    .pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;background:var(--soft);color:var(--muted)}.pill-success{background:rgba(72,199,142,.12);color:#8ce5bc}.pill-danger{background:rgba(255,107,107,.12);color:#ff9d9d}.pill-warning{background:rgba(247,184,75,.12);color:#ffd488}.pill-info{background:rgba(102,179,255,.12);color:#a8d4ff}.pill-gold{background:rgba(214,173,91,.13);color:var(--gold2)}
+    .switch{position:relative;width:48px;height:28px;display:inline-block}.switch input{display:none}.switch span{position:absolute;inset:0;border-radius:999px;background:#43382d;transition:.2s}.switch span:after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#cfc6ba;transition:.2s}.switch input:checked+span{background:var(--gold)}.switch input:checked+span:after{transform:translateX(20px);background:#241a0c}.switch-row{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:13px;padding:11px 12px}.switch-row b,.switch-row small{display:block}.switch-row small{color:var(--muted)}
+    .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:5px;margin-bottom:14px}.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:8px 12px;white-space:nowrap;font-weight:800}.tab.active{background:var(--gold);color:#21170a;border-color:var(--gold)}
+    .empty{padding:28px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.empty .eico{font-size:32px;display:block;margin-bottom:5px}.total-box{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(214,173,91,.16),rgba(139,94,60,.1));border:1px solid rgba(214,173,91,.28)}.total-box span{color:var(--muted)}.total-box strong{font-size:23px;color:var(--gold2)}
+    .progress{height:12px;border-radius:999px;background:#0f0d0b;overflow:hidden;border:1px solid var(--line)}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--leather),var(--gold2));border-radius:inherit;transition:.4s;width:0}.rank{display:grid;gap:10px}.rank-item{display:grid;grid-template-columns:minmax(80px,1fr) 2fr auto;gap:9px;align-items:center}.rank-item .bar{height:9px;background:#0f0d0b;border-radius:999px;overflow:hidden}.rank-item .bar span{display:block;height:100%;background:linear-gradient(90deg,var(--leather),var(--gold));border-radius:999px}.rank-item b{font-size:13px}.rank-item small{color:var(--muted)}
+    .carousel{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,78%);gap:10px;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:5px}.carousel>*{scroll-snap-align:start}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:500;display:grid;place-items:end center;padding:12px}.modal{width:min(620px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:23px 23px 16px 16px;box-shadow:var(--shadow)}.modal-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}.modal-head h3{font-family:Georgia,serif;margin:0}.modal-body{padding:17px}.modal-foot{padding:13px 17px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.close{margin-left:auto}
+    .toast-wrap{position:fixed;z-index:900;top:76px;right:12px;display:grid;gap:8px;width:min(360px,calc(100% - 24px))}.toast{background:#211b16;border:1px solid var(--line);border-left:4px solid var(--gold);padding:12px 14px;border-radius:12px;box-shadow:var(--shadow);animation:toastIn .2s}.toast.error{border-left-color:var(--danger)}.toast.success{border-left-color:var(--success)}@keyframes toastIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+    .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90}.drag-list{display:grid;gap:7px}.drag-item{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#17130f;display:flex;align-items:center;gap:9px}.drag-item.dragging{opacity:.4}.drag-handle{color:var(--muted);cursor:grab;font-size:18px}.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.check-card{display:flex;gap:8px;align-items:center;padding:9px;border:1px solid var(--line);border-radius:11px;background:#17130f}
+    /* // ELIMINADO: estilos exclusivos de la vista Calendario mensual. */
+    .booking-shell{min-height:100vh;padding:18px 14px 40px;display:grid;place-items:start center}.booking-card{width:min(680px,100%);margin-top:10px}.booking-hero{text-align:center;padding:24px 16px}.booking-hero .brand{justify-content:center}.booking-hero h1{font-family:Georgia,serif;font-size:30px;margin:18px 0 8px}.booking-hero p{color:var(--muted);margin:0}.steps{display:flex;gap:6px;margin:16px 0}.step-dot{height:6px;flex:1;border-radius:999px;background:var(--soft)}.step-dot.active{background:var(--gold)}.service-grid{display:grid;gap:10px}.select-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#17130f;cursor:pointer;display:flex;align-items:center;gap:12px}.select-card.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(214,173,91,.1)}.select-card .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center}.select-card.active .radio{border-color:var(--gold)}.select-card.active .radio:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--gold)}.select-card strong{display:block}.select-card small{color:var(--muted)}.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.slot{border:1px solid var(--line);background:#17130f;color:var(--text);border-radius:11px;padding:10px 5px;font-weight:800}.slot.active{background:var(--gold);color:#21170a;border-color:var(--gold)}.slot:disabled{opacity:.35;cursor:not-allowed}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:70;background:rgba(20,17,14,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:7px 8px calc(7px + var(--safe-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.bottom-nav button{border:0;background:transparent;color:var(--muted);display:grid;justify-items:center;gap:2px;font-size:10px;font-weight:800;padding:4px;border-radius:10px}.bottom-nav button span{font-size:20px}.bottom-nav button.active{color:var(--gold2);background:rgba(214,173,91,.08)}
+    @media(min-width:760px){.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.modal-backdrop{place-items:center}.modal{border-radius:20px}.check-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.slot-grid{grid-template-columns:repeat(5,1fr)}} /* // MODIFICADO: retiradas reglas exclusivas de Calendario. */
+    @media(min-width:1040px){.sidebar{transform:none}.topbar{margin-left:278px}.main-wrap{margin-left:278px}.menu-toggle,.menu-overlay,.bottom-nav{display:none!important}main{padding:22px}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.carousel{grid-auto-columns:minmax(250px,32%)}}
+    @media(max-width:640px){.table-wrap.desktop-table{display:none}.page-head{align-items:center}.page-head p{font-size:13px}.page-head .actions .btn span.txt{display:none}.hide-mobile{display:none!important}.card{padding:14px}.rank-item{grid-template-columns:1fr 1.3fr auto}} /* // MODIFICADO: retiradas reglas móviles exclusivas de Calendario. */
+    @media(min-width:641px){.mobile-list{display:none!important}}
+  </style>
+</head>
+<body>
+  <div id="appLoading" class="app-loading"><div class="loader" aria-label="Cargando"></div></div>
+  <div id="authRoot" class="hidden"></div>
+  <div id="publicRoot" class="hidden"></div>
+  <div id="appRoot" class="hidden"></div>
+  <div id="modalRoot"></div>
+  <div id="toastRoot" class="toast-wrap"></div>
+
+<script type="module">
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+  createUserWithEmailAndPassword, signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {
+  initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+  collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
+  onSnapshot, query, where, orderBy, limit, serverTimestamp, Timestamp,
+  writeBatch, runTransaction, increment, deleteField
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCV8fV9gLkQ7A9rweaOs3Z5rp6TP5amD94",
+  authDomain: "avabarbers-6460d.firebaseapp.com",
+  projectId: "avabarbers-6460d",
+  storageBucket: "avabarbers-6460d.firebasestorage.app",
+  messagingSenderId: "457904927484",
+  appId: "1:457904927484:web:6245c18aaf3a9e26fe9d79",
+  measurementId: "G-TZQR0LEE4V"
+};
+
+const app = initializeApp(firebaseConfig);
+let db;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+} catch (e) {
+  db = initializeFirestore(app, {});
+}
+const auth = getAuth(app);
+
+const SECTION_META = {
+  dashboard:{label:"Dashboard",icon:"◫"},
+  billing:{label:"Facturación",icon:"▣"},
+  sales:{label:"Ventas",icon:"▥"},
+  // ELIMINADO: la sección Cartera fue retirada del sistema.
+  agenda:{label:"Agenda",icon:"◷"},
+  availability:{label:"Horarios Disponibles",icon:"◷"}, // NUEVO: consulta de espacios aún no reservados.
+  // ELIMINADO: la sección Calendario mensual fue retirada del sistema.
+  clients:{label:"Clientes",icon:"♙"},
+  purchaseEntry:{label:"Ingreso de Compras",icon:"＋"},
+  purchaseHistory:{label:"Historial de Compras",icon:"≡"},
+  inventory:{label:"Inventario",icon:"▦"},
+  products:{label:"Productos",icon:"◆"},
+  expenseEntry:{label:"Ingreso de Gastos",icon:"−"},
+  expenseHistory:{label:"Historial de Gastos",icon:"☷"},
+  settings:{label:"Configuración",icon:"⚙"}
+};
+const ALL_SECTIONS = Object.keys(SECTION_META);
+const DEFAULT_ORDER = ["dashboard","billing","agenda","availability","clients","sales","purchaseEntry","purchaseHistory","inventory","products","expenseEntry","expenseHistory","settings"]; // MODIFICADO: nuevo orden sin Cartera/Calendario.
+const PUBLIC_PATH = location.pathname.replace(/\/+$/,'').endsWith('/citas-clientes') || location.hash === '#citas-clientes';
+const BOGOTA_TZ = 'America/Bogota';
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+
+const state = {
+  user:null, profile:null, settings:null, activeSection:'dashboard', rendered:new Set(),
+  listeners:[], unseenAppointments:0, // MODIFICADO: eliminado currentMonth, usado solo por Calendario.
+  caches:{services:[],products:[],clients:[],purchases:[],expenses:[],sales:[],appointments:[],statuses:[]}, // MODIFICADO: eliminado cache exclusivo de Cartera.
+  temp:{purchase:[],invoice:[]}
+};
+
+function esc(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function val(id,root=document){return $(id,root)?.value?.trim?.() ?? ''}
+function num(v){const n=Number(String(v??'').replace(/[^0-9,.-]/g,'').replace(',','.'));return Number.isFinite(n)?n:0}
+function round2(n){return Math.round((Number(n)+Number.EPSILON)*100)/100}
+function money(n,dec=0){return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:dec,maximumFractionDigits:2}).format(num(n))}
+function normalizeName(s=''){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ')}
+function docKey(name=''){return encodeURIComponent(normalizeName(name)).replaceAll('%','_').replaceAll('.','_2E').slice(0,500) || crypto.randomUUID()}
+function dateKey(d=new Date()){
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:BOGOTA_TZ,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));return `${o.year}-${o.month}-${o.day}`;
+}
+function timeKey(d=new Date()){
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:BOGOTA_TZ,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d);
+  const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));return `${o.hour}:${o.minute}`;
+}
+function bogotaNow(){return {date:dateKey(),time:timeKey(),timestamp:Timestamp.now()}}
+function bogotaDate(date,time='00:00'){return new Date(`${date}T${time}:00-05:00`)}
+function tsToDate(v){return v?.toDate?v.toDate():v instanceof Date?v:new Date(v||0)}
+function formatDate(v,opts={}){const d=typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)?bogotaDate(v,'12:00'):tsToDate(v);return new Intl.DateTimeFormat('es-CO',{timeZone:BOGOTA_TZ,day:'2-digit',month:'short',year:'numeric',...opts}).format(d)}
+function formatTime(v){const d=tsToDate(v);return new Intl.DateTimeFormat('es-CO',{timeZone:BOGOTA_TZ,hour:'numeric',minute:'2-digit',hour12:true}).format(d)}
+function formatDateTime(v){return `${formatDate(v)} · ${formatTime(v)}`}
+function minutesToTime(m){const h=Math.floor(m/60)%24,mm=m%60;return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`}
+function timeToMinutes(t='00:00'){const [h,m]=t.split(':').map(Number);return h*60+m}
+function addDays(key,days){const d=bogotaDate(key,'12:00');d.setUTCDate(d.getUTCDate()+days);return dateKey(d)}
+function dateRangeOk(key,from,to){return (!from||key>=from)&&(!to||key<=to)}
+function currentMonthKey(){return dateKey().slice(0,7)}
+function initials(name='AVA'){return name.split(/\s+/).slice(0,2).map(x=>x[0]?.toUpperCase()||'').join('')}
+function debounce(fn,ms=450){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+function randomId(prefix='id'){return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`}
+function hasSection(id){return state.profile?.role==='Administrador'||(state.profile?.enabledSections||[]).includes(id)}
+function productsEnabled(){return state.settings?.sellsProducts !== false}
+function safePhone(v=''){return String(v).replace(/\D/g,'').replace(/^57(?=3\d{9}$)/,'')}
+function waPhone(v=''){const p=safePhone(v);return p.length===10?`57${p}`:p}
+function statusPill(text,type='gold'){return `<span class="pill pill-${type}">${esc(text)}</span>`}
+function empty(text='No hay registros todavía',ico='◇'){return `<div class="empty"><span class="eico">${ico}</span>${esc(text)}</div>`}
+
+function toast(message,type='success',ttl=3600){
+  const el=document.createElement('div');el.className=`toast ${type}`;el.innerHTML=`<b>${type==='error'?'Atención':'AVA'}</b><div>${esc(message)}</div>`;
+  $('#toastRoot').append(el);setTimeout(()=>el.remove(),ttl);
+}
+function setLoading(on){$('#appLoading').classList.toggle('hidden',!on)}
+function setOnline(){const dot=$('.connection-dot');if(dot)dot.classList.toggle('off',!navigator.onLine)}
+window.addEventListener('online',setOnline);window.addEventListener('offline',setOnline);
+
+function modal({title,body,confirmText='Confirmar',cancelText='Cancelar',danger=false,onConfirm=null,wide=false}){
+  return new Promise(resolve=>{
+    const root=$('#modalRoot');
+    root.innerHTML=`<div class="modal-backdrop"><div class="modal ${wide?'wide':''}" role="dialog" aria-modal="true">
+      <div class="modal-head"><h3>${esc(title)}</h3><button class="icon-btn close" data-close>×</button></div>
+      <div class="modal-body">${body}</div>
+      <div class="modal-foot"><button class="btn btn-ghost" data-close>${esc(cancelText)}</button><button class="btn ${danger?'btn-danger':'btn-primary'}" data-confirm>${esc(confirmText)}</button></div>
+    </div></div>`;
+    const finish=v=>{root.innerHTML='';resolve(v)};
+    $$('[data-close]',root).forEach(b=>b.onclick=()=>finish(false));
+    $('[data-confirm]',root).onclick=async()=>{
+      const btn=$('[data-confirm]',root);btn.disabled=true;
+      try{if(onConfirm){const result=await onConfirm(root);if(result===false){btn.disabled=false;return}}finish(true)}catch(e){console.error(e);toast(errorText(e),'error');btn.disabled=false}
+    };
+    $('.modal-backdrop',root).addEventListener('click',e=>{if(e.target.classList.contains('modal-backdrop'))finish(false)});
+  });
+}
+async function confirmAction(message,title='Confirmar acción',danger=true){return modal({title,body:`<p class="m0">${esc(message)}</p>`,confirmText:'Sí, continuar',danger})}
+function errorText(e){
+  const code=e?.code||'';
+  const map={
+    'auth/invalid-credential':'Correo o contraseña incorrectos.','auth/email-already-in-use':'Ese correo ya está registrado.',
+    'auth/weak-password':'La contraseña debe tener mínimo 6 caracteres.','auth/invalid-email':'El correo no es válido.',
+    'permission-denied':'No tienes permiso para realizar esta acción.','failed-precondition':'Falta crear un índice o activar un servicio en Firebase.',
+    'unavailable':'Sin conexión. La operación se sincronizará cuando vuelva internet.'
+  };
+  return map[code]||e?.message||'Ocurrió un error inesperado.';
+}
+
+function easterSunday(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  return new Date(Date.UTC(year,month-1,day,17,0,0));
+}
+function mondayAfter(year,month,day){const d=new Date(Date.UTC(year,month-1,day,17));const dow=d.getUTCDay();const add=dow===1?0:(8-dow)%7;d.setUTCDate(d.getUTCDate()+add);return dateKey(d)}
+function colombianHolidays(year){
+  const fixed=[[1,1,'Año Nuevo'],[5,1,'Día del Trabajo'],[7,20,'Independencia'],[8,7,'Batalla de Boyacá'],[12,8,'Inmaculada Concepción'],[12,25,'Navidad']];
+  const emiliani=[[1,6,'Reyes Magos'],[3,19,'San José'],[6,29,'San Pedro y San Pablo'],[8,15,'Asunción'],[10,12,'Día de la Raza'],[11,1,'Todos los Santos'],[11,11,'Independencia de Cartagena']];
+  const out=new Map();fixed.forEach(([m,d,n])=>out.set(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,n));emiliani.forEach(([m,d,n])=>out.set(mondayAfter(year,m,d),n));
+  const easter=easterSunday(year);const rel=[[-3,'Jueves Santo'],[-2,'Viernes Santo'],[43,'Ascensión del Señor'],[64,'Corpus Christi'],[71,'Sagrado Corazón']];
+  rel.forEach(([delta,n])=>{const d=new Date(easter);d.setUTCDate(d.getUTCDate()+delta);let key=dateKey(d);if(delta>0)key=mondayAfter(Number(key.slice(0,4)),Number(key.slice(5,7)),Number(key.slice(8,10)));out.set(key,n)});
+  return out;
+}
+function holidayName(key){return colombianHolidays(Number(key.slice(0,4))).get(key)||''}
+
+async function loadSettings(){
+  const snap=await getDoc(doc(db,'settings','main'));
+  state.settings=snap.exists()?snap.data():defaultSettings();
+  return state.settings;
+}
+function defaultSettings(){return {
+  businessName:'AVA Barbería',slogan:'Estilo, precisión y confianza',address:'',neighborhood:'',phone:'',
+  socialEnabled:false,socials:{instagram:'',facebook:'',tiktok:''},payments:{nequi:{enabled:false,number:'',holder:''},bank:{enabled:false,account:'',holder:'',bank:''}},
+  sellsProducts:true,opening:'08:00',lunchClose:'12:00',reopen:'14:00',closing:'19:00',holidayMode:false,
+  reminderMessage:'Hola, te recordamos tu cita el {fecha} a las {hora} para {servicio}. Te esperamos.',maxPeople:3,agendaDays:30,cutDuration:30,
+  absenceNotice:'⚠️ Si no puedes asistir, avisa con tiempo para liberar el espacio.',monthlyGoal:3000000,initialized:false,updatedAt:null
+}}
+function publicSettingsFrom(s){return {businessName:s.businessName||'AVA Barbería',slogan:s.slogan||'',phone:s.phone||'',socialEnabled:!!s.socialEnabled,socials:s.socials||{},opening:s.opening||'08:00',lunchClose:s.lunchClose||'12:00',reopen:s.reopen||'14:00',closing:s.closing||'19:00',holidayMode:!!s.holidayMode,reminderMessage:s.reminderMessage||'',maxPeople:num(s.maxPeople)||1,agendaDays:num(s.agendaDays)||30,cutDuration:num(s.cutDuration)||30,absenceNotice:s.absenceNotice||'',updatedAt:serverTimestamp()}}
+
+async function ensureSettings(){
+  const ref=doc(db,'settings','main');const snap=await getDoc(ref);
+  if(!snap.exists()){const defaults={...defaultSettings(),initialized:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()};await setDoc(ref,defaults);await setDoc(doc(db,'publicSettings','main'),publicSettingsFrom(defaults));}
+  await loadSettings();
+}
+
+function authView(mode='login'){
+  const root=$('#authRoot');root.classList.remove('hidden');$('#appRoot').classList.add('hidden');
+  const setup=mode==='setup';
+  root.innerHTML=`<div class="auth-shell"><div class="auth-card">
+    <div class="brand"><div class="brand-mark">A</div><div><h1>AVA</h1><small>Gestión para barberías</small></div></div>
+    <h2>${setup?'Crear administrador inicial':'Bienvenido de nuevo'}</h2>
+    <p>${setup?'Úsalo solo para la primera configuración del sistema.':'Ingresa a tu panel de trabajo.'}</p>
+    <form id="authForm">
+      ${setup?`<div class="field"><label>Nombre completo</label><input id="authName" required autocomplete="name" placeholder="Administrador principal"></div>`:''}
+      <div class="field"><label>Correo</label><input id="authEmail" type="email" required autocomplete="email" placeholder="admin@barberia.com"></div>
+      <div class="field"><label>Contraseña</label><input id="authPassword" type="password" required minlength="6" autocomplete="${setup?'new-password':'current-password'}" placeholder="Mínimo 6 caracteres"></div>
+      ${setup?`<div class="field"><label>Clave inicial</label><input id="setupKey" type="password" required placeholder="Clave de instalación"></div>`:''}
+      <button class="btn btn-primary btn-block" type="submit">${setup?'Crear cuenta y configurar':'Ingresar'}</button>
+    </form>
+    <div class="auth-alt"><button class="link-btn" id="switchAuth">${setup?'Ya tengo una cuenta':'Configurar primer administrador'}</button></div>
+  </div></div>`;
+  $('#switchAuth').onclick=()=>authView(setup?'login':'setup');
+  $('#authForm').onsubmit=async e=>{
+    e.preventDefault();const btn=$('button[type=submit]',e.currentTarget);btn.disabled=true;
+    try{
+      if(setup){
+        if(val('#setupKey')!=='avaadmin10')throw new Error('La clave inicial no es correcta.');
+        const cred=await createUserWithEmailAndPassword(auth,val('#authEmail'),val('#authPassword'));
+        const settingsRef=doc(db,'settings','main');
+        await runTransaction(db,async tx=>{
+          const s=await tx.get(settingsRef);if(s.exists())throw new Error('El sistema ya fue inicializado. Ingresa con una cuenta existente.');
+          tx.set(doc(db,'users',cred.user.uid),{name:val('#authName'),email:val('#authEmail').toLowerCase(),role:'Administrador',enabledSections:ALL_SECTIONS,menuOrder:DEFAULT_ORDER,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+          const initialSettings={...defaultSettings(),initialized:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()};tx.set(settingsRef,initialSettings);tx.set(doc(db,'publicSettings','main'),publicSettingsFrom(initialSettings));
+        });
+        toast('Administrador creado correctamente.');
+      }else await signInWithEmailAndPassword(auth,val('#authEmail'),val('#authPassword'));
+    }catch(err){toast(errorText(err),'error');btn.disabled=false}
+  };
+}
+
+function appShell(){
+  const profile=state.profile;const order=getMenuOrder();
+  $('#authRoot').classList.add('hidden');$('#publicRoot').classList.add('hidden');
+  const root=$('#appRoot');root.classList.remove('hidden');
+  root.innerHTML=`<div class="shell">
+    <div id="menuOverlay" class="menu-overlay hidden"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-head"><div class="brand"><div class="brand-mark">A</div><div><h1>AVA</h1><small>${esc(state.settings?.businessName||'Gestión de barbería')}</small></div></div>
+        <div class="side-user"><div class="avatar">${esc(initials(profile.name))}</div><div><b>${esc(profile.name)}</b><small>${esc(profile.role)}</small></div></div>
+      </div>
+      <nav class="nav" id="sideNav">${order.map(navButton).join('')}</nav>
+      <div class="side-foot"><button id="logoutBtn" class="btn btn-ghost btn-block">Salir de la cuenta</button></div>
+    </aside>
+    <header class="topbar"><button class="icon-btn menu-toggle" id="menuBtn">☰</button><div class="top-title"><h2 id="topTitle">Dashboard</h2><small id="topSubtitle">Hora de Bogotá · ${esc(timeKey())}</small></div><div class="top-actions"><div class="connection-dot" title="Estado de conexión"></div></div></header>
+    <div class="main-wrap"><main id="main"></main></div>
+    <nav class="bottom-nav" id="bottomNav">${['dashboard','billing','agenda','sales','settings'].filter(hasSection).map(navBottomButton).join('')}</nav>
+  </div>`;
+  $('#logoutBtn').onclick=()=>signOut(auth);
+  $('#menuBtn').onclick=toggleMenu;$('#menuOverlay').onclick=toggleMenu;
+  $$('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));
+  setOnline();navigate(state.activeSection,true);
+}
+function getMenuOrder(){
+  const saved=[...(state.profile?.menuOrder||DEFAULT_ORDER)]; // MODIFICADO: se conserva el orden guardado existente.
+  // NUEVO: administradores/perfiles autorizados antiguos reciben Horarios Disponibles sin migrar documentos de Firestore.
+  if(hasSection('availability')&&!saved.includes('availability')){const agendaIndex=saved.indexOf('agenda');saved.splice(agendaIndex>=0?agendaIndex+1:saved.length,0,'availability')}
+  let o=saved.filter(id=>SECTION_META[id]&&hasSection(id));
+  if(!productsEnabled())o=o.filter(id=>!['inventory','products'].includes(id));
+  return o.length?o:['dashboard'];
+}
+function navButton(id){const m=SECTION_META[id];return `<button class="nav-item" data-nav="${id}"><span class="ico">${m.icon}</span><span>${esc(m.label)}</span>${id==='agenda'?`<span id="agendaBadge" class="badge ${state.unseenAppointments?'':'hidden'}">${state.unseenAppointments||0}</span>`:''}</button>`}
+function navBottomButton(id){const m=SECTION_META[id];return `<button data-nav="${id}"><span>${m.icon}</span>${esc(m.label.split(' ')[0])}</button>`}
+function toggleMenu(){const s=$('#sidebar'),o=$('#menuOverlay');s.classList.toggle('open');o.classList.toggle('hidden')}
+function closeMenu(){if(innerWidth<1040){$('#sidebar')?.classList.remove('open');$('#menuOverlay')?.classList.add('hidden')}}
+
+const renderers={};
+async function navigate(id,force=false){
+  if(!SECTION_META[id]||!hasSection(id)||(!productsEnabled()&&['inventory','products'].includes(id)))id='dashboard';
+  state.activeSection=id;localStorage.setItem('ava-last-section',id);closeMenu();
+  $$('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===id));
+  $('#topTitle').textContent=SECTION_META[id].label;
+  const main=$('#main');main.innerHTML=`<div class="card center"><div class="loader" style="margin:auto"></div><p class="muted">Cargando ${esc(SECTION_META[id].label)}…</p></div>`;
+  try{await renderers[id](main);state.rendered.add(id)}catch(e){console.error(e);main.innerHTML=`<div class="card"><h3>No se pudo cargar</h3><p class="danger">${esc(errorText(e))}</p><button class="btn btn-secondary" id="retryRender">Reintentar</button></div>`;$('#retryRender').onclick=()=>navigate(id,true)}
+}
+
+async function getCollection(name,constraints=[]){const snap=await getDocs(query(collection(db,name),...constraints));return snap.docs.map(d=>({id:d.id,...d.data()}))}
+async function loadServices(){state.caches.services=await getCollection('services',[orderBy('name')]);return state.caches.services}
+async function loadProducts(){state.caches.products=productsEnabled()?await getCollection('products',[orderBy('name')]):[];return state.caches.products}
+async function loadClients(){state.caches.clients=await getCollection('clients',[orderBy('name')]);return state.caches.clients}
+async function loadStatuses(){state.caches.statuses=await getCollection('clientStatuses',[orderBy('name')]);return state.caches.statuses}
+async function getCounter(field){const snap=await getDoc(doc(db,'counters','main'));return (snap.data()?.[field]||0)+1}
+async function nextCounterTx(tx,field){const ref=doc(db,'counters','main'),snap=await tx.get(ref),next=(snap.data()?.[field]||0)+1;tx.set(ref,{[field]:next,updatedAt:serverTimestamp()},{merge:true});return next}
+
+function pageHead(title,subtitle='',actions=''){return `<div class="page-head"><div><h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</div>${actions?`<div class="actions">${actions}</div>`:''}</div>`}
+function filterCard(inner){return `<div class="card mb"><div class="row-wrap">${inner}</div></div>`}
+function rangeFields(prefix='f'){const t=dateKey();return `<div class="field"><label>Desde</label><input type="date" id="${prefix}From" value="${t}"></div><div class="field"><label>Hasta</label><input type="date" id="${prefix}To" value="${t}"></div>`}
+function itemTypeLabel(t){return ({sale:'Producto Venta',supply:'Producto Insumo',asset:'Producto Activo Fijo'})[t]||t}
+function paymentLabel(p){return ({cash:'Efectivo',nequi:'Nequi',transfer:'Transferencia',card:'Tarjeta'})[p]||p||'—'}
+function unitOptions(selected='Und'){return ['Und','Gr','Lb','Kg','Lt','Ml'].map(x=>`<option ${x===selected?'selected':''}>${x}</option>`).join('')}
+function paymentOptions(selected='cash'){return [['cash','Efectivo'],['nequi','Nequi'],['transfer','Transferencia'],['card','Tarjeta']].map(([v,l])=>`<option value="${v}" ${v===selected?'selected':''}>${l}</option>`).join('')}
+
+async function publicBookingApp(){
+  setLoading(true);$('#authRoot').classList.add('hidden');$('#appRoot').classList.add('hidden');
+  const root=$('#publicRoot');root.classList.remove('hidden');
+  try{
+    if(!auth.currentUser)await signInAnonymously(auth);
+    const publicSnap=await getDoc(doc(db,'publicSettings','main'));state.settings=publicSnap.exists()?publicSnap.data():publicSettingsFrom(defaultSettings());await loadServices();
+    const bk={step:1,service:null,people:1,date:'',time:'',available:[]};
+    const render=async()=>{
+      const s=state.settings||defaultSettings();
+      root.innerHTML=`<div class="booking-shell"><div class="booking-card">
+        <div class="booking-hero"><div class="brand"><div class="brand-mark">A</div><div><h1>AVA</h1><small>${esc(s.businessName||'Barbería')}</small></div></div>
+          <h1>Reserva tu cita en menos de un minuto</h1><p>${esc(s.slogan||'Elige el servicio y el horario que mejor te quede.')}</p></div>
+        <div class="steps">${[1,2,3,4].map(n=>`<span class="step-dot ${n<=bk.step?'active':''}"></span>`).join('')}</div>
+        <div class="card" id="bookingBody">${bookingStepHtml(bk,s)}</div>
+        <p class="center muted" style="font-size:12px;margin-top:14px">Horarios mostrados en hora de Bogotá, Colombia.</p>
+      </div></div>`;
+      bindBookingStep(bk,s,render);
+    };
+    await render();
+  }catch(e){root.innerHTML=`<div class="booking-shell"><div class="card booking-card"><h2>No se pudo abrir la agenda</h2><p class="danger">${esc(errorText(e))}</p><button class="btn btn-primary" onclick="location.reload()">Reintentar</button></div></div>`}
+  finally{setLoading(false)}
+}
+function bookingStepHtml(bk,s){
+  if(bk.step===1)return `<h3>1. Elige un servicio</h3><div class="service-grid">${state.caches.services.length?state.caches.services.map(x=>`<div class="select-card ${bk.service?.id===x.id?'active':''}" data-service="${x.id}"><span class="radio"></span><div><strong>${esc(x.name)}</strong><small>${money(x.price)}</small></div></div>`).join(''):empty('La barbería aún no ha publicado servicios.')}</div>
+    <div class="field mt"><label>Cantidad de personas</label><select id="bkPeople">${Array.from({length:Math.max(1,num(s.maxPeople)||1)},(_,i)=>`<option value="${i+1}" ${bk.people===i+1?'selected':''}>${i+1} ${i?'personas':'persona'}</option>`).join('')}</select></div>
+    <button class="btn btn-primary btn-block" id="bkNext" ${bk.service?'':'disabled'}>Continuar</button>`;
+  if(bk.step===2){
+    const max=addDays(dateKey(),Math.max(0,num(s.agendaDays)||30));
+    return `<h3>2. Elige la fecha</h3><div class="field"><label>Fecha de la cita</label><input id="bkDate" type="date" min="${dateKey()}" max="${max}" value="${esc(bk.date)}"></div>
+      <div id="holidayInfo">${bk.date&&holidayName(bk.date)?statusPill(holidayName(bk.date),'warning'):''}</div><div class="row"><button class="btn btn-ghost" id="bkBack">Atrás</button><button class="btn btn-primary" id="bkNext" ${bk.date?'':'disabled'} style="flex:1">Ver horarios</button></div>`;
+  }
+  if(bk.step===3)return `<h3>3. Elige un horario</h3><p class="card-sub">${esc(bk.service?.name||'')} · ${bk.people} ${bk.people===1?'persona':'personas'} · ${formatDate(bk.date)}</p>
+    ${bk.available.length?`<div class="slot-grid">${bk.available.map(t=>`<button class="slot ${bk.time===t?'active':''}" data-slot="${t}">${formatClock(t)}</button>`).join('')}</div>`:empty('No hay horarios disponibles para esta fecha.','◷')}
+    <div class="row mt"><button class="btn btn-ghost" id="bkBack">Atrás</button><button class="btn btn-primary" id="bkNext" ${bk.time?'':'disabled'} style="flex:1">Continuar</button></div>`;
+  return `<h3>4. Tus datos</h3><div class="total-box mb"><span>${esc(bk.service?.name||'Servicio')}<br><small>${formatDate(bk.date)} · ${formatClock(bk.time)} · ${bk.people} ${bk.people===1?'persona':'personas'}</small></span><strong>${money((bk.service?.price||0)*bk.people)}</strong></div>
+    <div class="field"><label>Nombre completo</label><input id="bkName" autocomplete="name" required placeholder="Tu nombre"></div><div class="field"><label>Celular</label><input id="bkPhone" inputmode="tel" autocomplete="tel" required placeholder="300 123 4567"></div>
+    <div class="card" style="background:#17130f"><p class="m0">${esc(s.absenceNotice||'')}</p></div>
+    <div class="row mt"><button class="btn btn-ghost" id="bkBack">Atrás</button><button class="btn btn-primary" id="bkConfirm" style="flex:1">Confirmar cita</button></div>`;
+}
+function bindBookingStep(bk,s,render){
+  $$('[data-service]').forEach(el=>el.onclick=()=>{bk.service=state.caches.services.find(x=>x.id===el.dataset.service);render()});
+  $('#bkPeople')?.addEventListener('change',e=>bk.people=num(e.target.value));
+  $('#bkDate')?.addEventListener('change',e=>{bk.date=e.target.value;const h=holidayName(bk.date);$('#holidayInfo').innerHTML=h?statusPill(h,'warning'):'';$('#bkNext').disabled=!bk.date});
+  $$('[data-slot]').forEach(el=>el.onclick=()=>{bk.time=el.dataset.slot;render()});
+  $('#bkBack')?.addEventListener('click',()=>{bk.step--;bk.time='';render()});
+  $('#bkNext')?.addEventListener('click',async()=>{
+    if(bk.step===1&&!bk.service)return;
+    if(bk.step===2){
+      if(!bk.date)return;
+      if(s.holidayMode&&holidayName(bk.date)){toast('La barbería no recibe reservas en festivos.','error');return}
+      const btn=$('#bkNext');btn.disabled=true;btn.textContent='Consultando…';bk.available=await availableSlots(bk.date,bk.people,s);bk.step++;bk.time='';render();return;
+    }
+    bk.step++;render();
+  });
+  $('#bkConfirm')?.addEventListener('click',async()=>{
+    const name=val('#bkName'),phone=safePhone(val('#bkPhone'));if(!name||phone.length<7){toast('Completa tu nombre y celular.','error');return}
+    const btn=$('#bkConfirm');btn.disabled=true;btn.textContent='Reservando…';
+    try{
+      await createAppointment({name,phone,service:bk.service,people:bk.people,date:bk.date,time:bk.time,settings:s});
+      $('#bookingBody').innerHTML=`<div class="center" style="padding:20px 5px"><div style="font-size:56px">✓</div><h2>¡Cita confirmada, ${esc(name.split(' ')[0])}!</h2><p class="muted">Te esperamos el <b class="gold">${formatDate(bk.date)}</b> a las <b class="gold">${formatClock(bk.time)}</b>.</p><button class="btn btn-primary" id="bkAgain">Reservar otra cita</button></div>`;
+      $('#bkAgain').onclick=()=>location.reload();
+    }catch(e){toast(errorText(e),'error');btn.disabled=false;btn.textContent='Confirmar cita';bk.step=3;bk.time='';await render()}
+  });
+}
+function formatClock(t){const [h,m]=t.split(':').map(Number);const suffix=h>=12?'p. m.':'a. m.';const hh=h%12||12;return `${hh}:${String(m).padStart(2,'0')} ${suffix}`}
+function serviceIntervals(s){
+  const open=timeToMinutes(s.opening||'08:00'),lc=timeToMinutes(s.lunchClose||'12:00'),re=timeToMinutes(s.reopen||'14:00'),close=timeToMinutes(s.closing||'19:00');
+  const ranges=[];if(open<lc)ranges.push([open,lc]);if(re<close)ranges.push([re,close]);if(!ranges.length&&open<close)ranges.push([open,close]);return ranges;
+}
+function slotKeys(date,start,count,duration){return Array.from({length:count},(_,i)=>`${date}_${minutesToTime(start+i*duration).replace(':','')}`)}
+async function availableSlots(date,people,s,excludeKeys=[]){
+  const duration=Math.max(5,num(s.cutDuration)||30),needed=Math.max(1,people),out=[];
+  const slotsSnap=await getDocs(query(collection(db,'appointmentSlots'),where('dateKey','==',date)));
+  const occupied=new Set(slotsSnap.docs.map(d=>d.id));excludeKeys.forEach(k=>occupied.delete(k));
+  for(const [a,b] of serviceIntervals(s))for(let start=a;start+duration*needed<=b;start+=duration){
+    const keys=slotKeys(date,start,needed,duration);if(keys.every(k=>!occupied.has(k)))out.push(minutesToTime(start));
+  }
+  return out;
+}
+async function createAppointment({name,phone,service,people,date,time,settings}){
+  const start=timeToMinutes(time),duration=Math.max(5,num(settings.cutDuration)||30),keys=slotKeys(date,start,people,duration),appointmentRef=doc(collection(db,'appointments'));
+  await runTransaction(db,async tx=>{
+    for(const key of keys){const r=doc(db,'appointmentSlots',key),snap=await tx.get(r);if(snap.exists())throw new Error('Ese horario acaba de ser reservado. Elige otro.');}
+    const startsAt=Timestamp.fromDate(bogotaDate(date,time));
+    tx.set(appointmentRef,{clientName:name,phone,serviceId:service.id,serviceName:service.name,servicePrice:num(service.price),people,quantity:people,dateKey:date,time,startsAt,durationMinutes:duration*people,status:'scheduled',seen:false,createdBy:auth.currentUser?.uid||'',createdAt:serverTimestamp(),slotKeys:keys});
+    keys.forEach(key=>tx.set(doc(db,'appointmentSlots',key),{appointmentId:appointmentRef.id,dateKey:date,timeKey:key.slice(-4),ownerUid:auth.currentUser?.uid||'',createdAt:serverTimestamp()}));
+  });
+}
+
+renderers.settings=async root=>{
+  await loadSettings();await loadServices();
+  root.innerHTML=`${pageHead('Configuración','Datos, accesos, servicios y logística de la barbería')}
+    <div class="tabs" id="settingsTabs">
+      <button class="tab active" data-tab="business">Barbería</button><button class="tab" data-tab="users">Usuarios</button><button class="tab" data-tab="catalog">Servicios y productos</button><button class="tab" data-tab="logistics">Logística</button>
+    </div><div id="settingsContent"></div>`;
+  $$('[data-tab]').forEach(b=>b.onclick=()=>{$$('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));renderSettingsTab(b.dataset.tab)});
+  renderSettingsTab('business');
+};
+function renderSettingsTab(tab){
+  const root=$('#settingsContent');if(!root)return;
+  if(tab==='business')renderBusinessSettings(root);else if(tab==='users')renderUserSettings(root);else if(tab==='catalog')renderCatalogSettings(root);else renderLogisticsSettings(root);
+}
+function renderBusinessSettings(root){
+  const s=state.settings,p=s.payments||{},soc=s.socials||{};
+  root.innerHTML=`<form id="businessForm" class="grid grid-2">
+    <div class="card"><h3>Información de la barbería</h3>
+      <div class="field"><label>Nombre de la barbería *</label><input id="businessName" required value="${esc(s.businessName||'')}"></div>
+      <div class="field"><label>Slogan</label><input id="slogan" value="${esc(s.slogan||'')}"></div>
+      <div class="field"><label>Dirección</label><input id="address" value="${esc(s.address||'')}"></div>
+      <div class="grid grid-2"><div class="field"><label>Barrio</label><input id="neighborhood" value="${esc(s.neighborhood||'')}"></div><div class="field"><label>Teléfono</label><input id="businessPhone" inputmode="tel" value="${esc(s.phone||'')}"></div></div>
+      <div class="field"><label>Meta mensual (COP)</label><input id="monthlyGoal" type="number" min="0" step="1000" value="${num(s.monthlyGoal)}"></div>
+    </div>
+    <div class="stack">
+      <div class="card"><h3>Redes sociales</h3><div class="switch-row"><div><b>Mostrar redes sociales</b><small>Activa los enlaces públicos de la barbería.</small></div><label class="switch"><input id="socialEnabled" type="checkbox" ${s.socialEnabled?'checked':''}><span></span></label></div>
+        <div id="socialFields" class="mt ${s.socialEnabled?'':'hidden'}"><div class="field"><label>Instagram</label><input id="instagram" type="url" value="${esc(soc.instagram||'')}" placeholder="https://instagram.com/..."></div><div class="field"><label>Facebook</label><input id="facebook" type="url" value="${esc(soc.facebook||'')}" placeholder="https://facebook.com/..."></div><div class="field"><label>TikTok</label><input id="tiktok" type="url" value="${esc(soc.tiktok||'')}" placeholder="https://tiktok.com/@..."></div></div>
+      </div>
+      <div class="card"><h3>Cuentas de pago</h3>
+        <div class="switch-row"><div><b>Nequi</b><small>Recibir pagos por número de celular.</small></div><label class="switch"><input id="nequiEnabled" type="checkbox" ${p.nequi?.enabled?'checked':''}><span></span></label></div>
+        <div id="nequiFields" class="grid grid-2 mt ${p.nequi?.enabled?'':'hidden'}"><div class="field"><label>Número</label><input id="nequiNumber" inputmode="tel" value="${esc(p.nequi?.number||'')}"></div><div class="field"><label>Titular</label><input id="nequiHolder" value="${esc(p.nequi?.holder||'')}"></div></div>
+        <div class="switch-row mt"><div><b>Cuenta bancaria / llave</b><small>Transferencias bancarias.</small></div><label class="switch"><input id="bankEnabled" type="checkbox" ${p.bank?.enabled?'checked':''}><span></span></label></div>
+        <div id="bankFields" class="mt ${p.bank?.enabled?'':'hidden'}"><div class="field"><label>Número de cuenta o llave</label><input id="bankAccount" value="${esc(p.bank?.account||'')}"></div><div class="grid grid-2"><div class="field"><label>Titular</label><input id="bankHolder" value="${esc(p.bank?.holder||'')}"></div><div class="field"><label>Banco</label><input id="bankName" value="${esc(p.bank?.bank||'')}"></div></div></div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Guardar configuración</button>
+    </div></form>`;
+  $('#socialEnabled').onchange=e=>$('#socialFields').classList.toggle('hidden',!e.target.checked);
+  $('#nequiEnabled').onchange=e=>$('#nequiFields').classList.toggle('hidden',!e.target.checked);
+  $('#bankEnabled').onchange=e=>$('#bankFields').classList.toggle('hidden',!e.target.checked);
+  $('#businessForm').onsubmit=async e=>{
+    e.preventDefault();if(!val('#businessName')){toast('El nombre de la barbería es obligatorio.','error');return}
+    try{
+      await updateDoc(doc(db,'settings','main'),{businessName:val('#businessName'),slogan:val('#slogan'),address:val('#address'),neighborhood:val('#neighborhood'),phone:val('#businessPhone'),monthlyGoal:num(val('#monthlyGoal')),socialEnabled:$('#socialEnabled').checked,socials:{instagram:val('#instagram'),facebook:val('#facebook'),tiktok:val('#tiktok')},payments:{nequi:{enabled:$('#nequiEnabled').checked,number:val('#nequiNumber'),holder:val('#nequiHolder')},bank:{enabled:$('#bankEnabled').checked,account:val('#bankAccount'),holder:val('#bankHolder'),bank:val('#bankName')}},updatedAt:serverTimestamp()});
+      await loadSettings();await setDoc(doc(db,'publicSettings','main'),publicSettingsFrom(state.settings),{merge:true});toast('Configuración guardada.');appShell();
+    }catch(err){toast(errorText(err),'error')}
+  };
+}
+async function renderUserSettings(root){
+  if(state.profile?.role!=='Administrador'){root.innerHTML=`<div class="card">${empty('Solo un administrador puede gestionar usuarios.','🔒')}</div>`;return}
+  root.innerHTML=`<div class="card center"><div class="loader" style="margin:auto"></div></div>`;
+  const users=await getCollection('users',[orderBy('name')]);
+  root.innerHTML=`<div class="card"><div class="row"><div><h3 class="m0">Usuarios</h3><p class="muted m0">Permisos y orden personalizado del menú.</p></div><button class="btn btn-primary" id="addUserBtn" style="margin-left:auto">＋ Crear usuario</button></div><div class="separator"></div>
+    <div class="responsive-list">${users.length?users.map(u=>`<div class="list-card"><div class="list-head"><div><h4>${esc(u.name)}</h4><p>${esc(u.email)} · ${esc(u.role)}</p></div>${u.active===false?statusPill('Desactivado','danger'):statusPill('Activo','success')}</div><p><small>${(u.enabledSections||[]).map(id=>SECTION_META[id]?.label).filter(Boolean).join(' · ')||'Sin secciones'}</small></p><div class="list-actions"><button class="btn btn-secondary btn-sm" data-edit-user="${u.id}">Editar</button>${u.id!==state.user.uid?`<button class="btn btn-danger btn-sm" data-delete-user="${u.id}">Eliminar acceso</button>`:''}</div></div>`).join(''):empty('No hay usuarios registrados.')}</div></div>`;
+  $('#addUserBtn').onclick=()=>userModal();
+  $$('[data-edit-user]').forEach(b=>b.onclick=()=>userModal(users.find(u=>u.id===b.dataset.editUser)));
+  $$('[data-delete-user]').forEach(b=>b.onclick=async()=>{const u=users.find(x=>x.id===b.dataset.deleteUser);if(await confirmAction(`Se eliminará el acceso de ${u.name}. La cuenta de Authentication quedará inhabilitada porque ya no tendrá perfil autorizado.`)){await deleteDoc(doc(db,'users',u.id));toast('Acceso eliminado.');renderUserSettings(root)}});
+}
+function permissionsEditorHtml(selected=ALL_SECTIONS,order=DEFAULT_ORDER){
+  const set=new Set(selected);const sorted=[...order.filter(x=>SECTION_META[x]),...ALL_SECTIONS.filter(x=>!order.includes(x))];
+  return `<div class="field"><label>Secciones habilitadas</label><div class="check-grid" id="permissionChecks">${ALL_SECTIONS.map(id=>`<label class="check-card"><input type="checkbox" value="${id}" ${set.has(id)?'checked':''}><span>${SECTION_META[id].icon} ${esc(SECTION_META[id].label)}</span></label>`).join('')}</div></div>
+    <div class="field"><label>Orden del menú</label><small>Arrastra para ordenar. Solo aparecerán las secciones habilitadas.</small><div class="drag-list" id="menuOrderList">${sorted.map(id=>`<div class="drag-item" draggable="true" data-id="${id}"><span class="drag-handle">☷</span><span>${SECTION_META[id].icon} ${esc(SECTION_META[id].label)}</span></div>`).join('')}</div></div>`;
+}
+function bindDragList(root=document){
+  let dragged=null;$$('.drag-item',root).forEach(item=>{
+    item.ondragstart=()=>{dragged=item;item.classList.add('dragging')};item.ondragend=()=>{item.classList.remove('dragging');dragged=null};
+    item.ondragover=e=>{e.preventDefault();if(!dragged||dragged===item)return;const box=item.getBoundingClientRect(),after=e.clientY>box.top+box.height/2;item.parentElement.insertBefore(dragged,after?item.nextSibling:item)};
+  });
+}
+async function userModal(user=null){
+  const editing=!!user;
+  await modal({title:editing?'Editar usuario':'Crear usuario',confirmText:editing?'Guardar cambios':'Crear usuario',body:`
+    <div class="grid grid-2"><div class="field"><label>Nombre</label><input id="uName" value="${esc(user?.name||'')}"></div><div class="field"><label>Rol</label><select id="uRole"><option ${user?.role==='Trabajador'?'selected':''}>Trabajador</option><option ${user?.role==='Administrador'?'selected':''}>Administrador</option></select></div></div>
+    <div class="field"><label>Correo</label><input id="uEmail" type="email" value="${esc(user?.email||'')}" ${editing?'disabled':''}></div>${editing?'':`<div class="field"><label>Contraseña temporal</label><input id="uPassword" type="password" minlength="6"></div>`}
+    ${permissionsEditorHtml(user?.enabledSections||ALL_SECTIONS,user?.menuOrder||DEFAULT_ORDER)}`,onConfirm:async root=>{
+      const name=val('#uName',root),email=val('#uEmail',root).toLowerCase(),role=val('#uRole',root),enabled=$$('#permissionChecks input:checked',root).map(x=>x.value),order=$$('#menuOrderList .drag-item',root).map(x=>x.dataset.id);
+      if(!name||(!editing&&!email)||!enabled.length){toast('Completa los datos y habilita al menos una sección.','error');return false}
+      if(editing){await updateDoc(doc(db,'users',user.id),{name,role,enabledSections:enabled,menuOrder:order,active:true,updatedAt:serverTimestamp()})}
+      else{
+        const password=val('#uPassword',root);if(password.length<6){toast('La contraseña debe tener mínimo 6 caracteres.','error');return false}
+        const secondary=initializeApp(firebaseConfig,`creator-${Date.now()}`);const secondaryAuth=getAuth(secondary);
+        try{const cred=await createUserWithEmailAndPassword(secondaryAuth,email,password);await setDoc(doc(db,'users',cred.user.uid),{name,email,role,enabledSections:enabled,menuOrder:order,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});await signOut(secondaryAuth)}finally{await deleteApp(secondary)}
+      }
+      toast(editing?'Usuario actualizado.':'Usuario creado.');setTimeout(()=>renderSettingsTab('users'),0);
+    }});
+  bindDragList($('#modalRoot'));
+}
+function renderCatalogSettings(root){
+  const s=state.settings;
+  root.innerHTML=`<div class="grid grid-2"><div class="card"><h3>Servicios</h3><form id="serviceForm" class="row-wrap"><div class="field"><label>Nombre</label><input id="serviceName" placeholder="Corte clásico"></div><div class="field"><label>Valor COP</label><input id="servicePrice" type="number" min="0" step="100" placeholder="25000"></div><button class="btn btn-primary" type="submit">Agregar</button></form><div class="separator"></div><div id="serviceList">${serviceListHtml()}</div></div>
+    <div class="card"><h3>Venta de productos</h3><div class="switch-row"><div><b>La barbería vende productos</b><small>Habilita inventario, catálogo y venta de productos.</small></div><label class="switch"><input id="sellsProducts" type="checkbox" ${s.sellsProducts!==false?'checked':''}><span></span></label></div><div class="mt">${s.sellsProducts!==false?statusPill('Inventario y productos habilitados','success'):statusPill('Solo insumos y activos fijos','warning')}</div></div></div>`;
+  $('#serviceForm').onsubmit=async e=>{e.preventDefault();const name=val('#serviceName'),price=num(val('#servicePrice'));if(!name||price<0){toast('Ingresa nombre y valor del servicio.','error');return}await addDoc(collection(db,'services'),{name,normalizedName:normalizeName(name),price,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});await loadServices();$('#serviceName').value='';$('#servicePrice').value='';$('#serviceList').innerHTML=serviceListHtml();bindServiceActions();toast('Servicio agregado.')};
+  $('#sellsProducts').onchange=async e=>{await updateDoc(doc(db,'settings','main'),{sellsProducts:e.target.checked,updatedAt:serverTimestamp()});await loadSettings();toast(e.target.checked?'Venta de productos habilitada.':'Venta de productos deshabilitada.');appShell();navigate('settings')};
+  bindServiceActions();
+}
+function serviceListHtml(){return state.caches.services.length?`<div class="responsive-list">${state.caches.services.map(x=>`<div class="list-card"><div class="row"><input data-service-name="${x.id}" value="${esc(x.name)}"><input data-service-price="${x.id}" type="number" min="0" step="100" value="${num(x.price)}"><button class="btn btn-danger btn-sm" data-delete-service="${x.id}">Eliminar</button></div><small class="muted">Los cambios se guardan automáticamente.</small></div>`).join('')}</div>`:empty('Agrega el primer servicio de la barbería.')}
+function bindServiceActions(){
+  const save=debounce(async(id)=>{const name=$(`[data-service-name="${id}"]`)?.value.trim(),price=num($(`[data-service-price="${id}"]`)?.value);if(!name)return;await updateDoc(doc(db,'services',id),{name,normalizedName:normalizeName(name),price,updatedAt:serverTimestamp()});toast('Servicio actualizado.');await loadServices()},500);
+  $$('[data-service-name],[data-service-price]').forEach(i=>i.oninput=()=>save(i.dataset.serviceName||i.dataset.servicePrice));
+  $$('[data-delete-service]').forEach(b=>b.onclick=async()=>{if(await confirmAction('¿Eliminar este servicio?')){await deleteDoc(doc(db,'services',b.dataset.deleteService));await loadServices();$('#serviceList').innerHTML=serviceListHtml();bindServiceActions();toast('Servicio eliminado.')}});
+}
+function renderLogisticsSettings(root){
+  const s=state.settings;
+  root.innerHTML=`<form id="logisticsForm" class="grid grid-2"><div class="card"><h3>Horarios</h3><div class="grid grid-2"><div class="field"><label>Apertura</label><input id="opening" type="time" value="${esc(s.opening||'08:00')}"></div><div class="field"><label>Cierre para almuerzo</label><input id="lunchClose" type="time" value="${esc(s.lunchClose||'12:00')}"></div><div class="field"><label>Reapertura</label><input id="reopen" type="time" value="${esc(s.reopen||'14:00')}"></div><div class="field"><label>Cierre definitivo</label><input id="closing" type="time" value="${esc(s.closing||'19:00')}"></div></div>
+      <div class="switch-row"><div><b>Bloquear festivos de Colombia</b><small>Detecta automáticamente festivos fijos, Semana Santa y Ley Emiliani.</small></div><label class="switch"><input id="holidayMode" type="checkbox" ${s.holidayMode?'checked':''}><span></span></label></div></div>
+    <div class="card"><h3>Reglas de agenda</h3><div class="grid grid-2"><div class="field"><label>Máximo de personas por reserva</label><input id="maxPeople" type="number" min="1" max="10" value="${num(s.maxPeople)||1}"></div><div class="field"><label>Días disponibles hacia adelante</label><input id="agendaDays" type="number" min="0" max="365" value="${num(s.agendaDays)||30}"></div><div class="field"><label>Duración promedio (minutos)</label><input id="cutDuration" type="number" min="5" step="5" value="${num(s.cutDuration)||30}"></div></div></div>
+    <div class="card"><h3>Mensajes</h3><div class="field"><label>Recordatorio al cliente</label><textarea id="reminderMessage">${esc(s.reminderMessage||'')}</textarea><small>Placeholders: {fecha}, {hora}, {servicio}.</small></div><div class="field"><label>Aviso de inasistencia</label><textarea id="absenceNotice">${esc(s.absenceNotice||'')}</textarea></div></div>
+    <div><button class="btn btn-primary btn-block" type="submit">Guardar logística</button></div></form>`;
+  $('#logisticsForm').onsubmit=async e=>{e.preventDefault();const opening=val('#opening'),lunchClose=val('#lunchClose'),reopen=val('#reopen'),closing=val('#closing');if(timeToMinutes(opening)>=timeToMinutes(closing)){toast('La apertura debe ser anterior al cierre.','error');return}await updateDoc(doc(db,'settings','main'),{opening,lunchClose,reopen,closing,holidayMode:$('#holidayMode').checked,maxPeople:Math.max(1,num(val('#maxPeople'))),agendaDays:Math.max(0,num(val('#agendaDays'))),cutDuration:Math.max(5,num(val('#cutDuration'))),reminderMessage:val('#reminderMessage'),absenceNotice:val('#absenceNotice'),updatedAt:serverTimestamp()});await loadSettings();await setDoc(doc(db,'publicSettings','main'),publicSettingsFrom(state.settings),{merge:true});toast('Logística guardada.')};
+}
+
+renderers.purchaseEntry=async root=>{
+  const purchases=await getCollection('purchases',[orderBy('createdAt','desc')]);state.caches.purchases=purchases;
+  const next=await getCounter('purchaseNo');state.temp.purchase=[];
+  const unique=[...new Map(purchases.map(p=>[normalizeName(p.description),p])).values()];
+  root.innerHTML=`${pageHead('Ingreso de Compras','Registra insumos, activos y productos para venta')}
+    <div class="grid grid-2"><div class="card"><h3>Nueva compra <span class="pill pill-gold">N.º ${next}</span></h3>
+      <div class="field"><label>Tipo de producto</label><select id="purchaseType">${productsEnabled()?'<option value="sale">Producto Venta</option>':''}<option value="supply">Producto Insumo</option><option value="asset">Producto Activo Fijo</option></select></div>
+      <div class="field"><label>Descripción</label><input id="purchaseDescription" list="purchaseSuggestions" autocomplete="off" placeholder="Ej. Cera para cabello"><datalist id="purchaseSuggestions">${unique.map(x=>`<option value="${esc(x.description)}"></option>`).join('')}</datalist><small id="existingProductNote"></small></div>
+      <div class="grid grid-2"><div class="field"><label>Cantidad</label><input id="purchaseQty" type="number" min="0.01" step="0.01" value="1"></div><div class="field"><label>Unidad de medida</label><select id="purchaseUnit">${unitOptions()}</select></div></div>
+      <div class="grid grid-2"><div class="field"><label>Valor total</label><input id="purchaseTotal" type="number" min="0" step="0.01" placeholder="0"></div><div class="field"><label>Valor unitario</label><input id="purchaseUnitValue" type="number" min="0" step="0.01" placeholder="0"></div></div>
+      <div class="field"><label>Fecha y hora</label><input value="${formatDate(new Date())} · ${formatTime(new Date())}" disabled></div>
+      <button class="btn btn-primary btn-block" id="addPurchaseItem">＋ Agregar ítem</button>
+    </div>
+    <div class="card"><div class="total-box"><span>Total de la pre-compra</span><strong id="purchaseTempTotal">${money(0,2)}</strong></div><div class="separator"></div><div id="purchaseTempList">${empty('Agrega productos a la compra.')}</div><button class="btn btn-success btn-block mt" id="savePurchase" disabled>Guardar compra completa</button></div></div>`;
+  let matched=null;
+  const matchExisting=()=>{
+    const n=normalizeName(val('#purchaseDescription'));matched=purchases.find(p=>normalizeName(p.description)===n)||null;
+    const note=$('#existingProductNote');if(matched){note.innerHTML=`<span class="warning">Producto ya existente. Se cargó la última unidad y costo.</span>`;$('#purchaseType').value=matched.type;$('#purchaseUnit').value=matched.unit||'Und';$('#purchaseUnitValue').value=round2(matched.unitValue||0);recalcPurchaseFromUnit()}else note.textContent='';
+  };
+  $('#purchaseDescription').onchange=matchExisting;$('#purchaseDescription').onblur=matchExisting;
+  function recalcPurchaseFromTotal(){const q=Math.max(.0001,num(val('#purchaseQty')));$('#purchaseUnitValue').value=round2(num(val('#purchaseTotal'))/q)}
+  function recalcPurchaseFromUnit(){const q=Math.max(0,num(val('#purchaseQty')));$('#purchaseTotal').value=round2(num(val('#purchaseUnitValue'))*q)}
+  $('#purchaseTotal').oninput=recalcPurchaseFromTotal;$('#purchaseUnitValue').oninput=recalcPurchaseFromUnit;$('#purchaseQty').oninput=()=>matched?recalcPurchaseFromUnit():recalcPurchaseFromTotal();
+  $('#addPurchaseItem').onclick=()=>{
+    const description=val('#purchaseDescription'),quantity=num(val('#purchaseQty')),totalValue=round2(num(val('#purchaseTotal'))),unitValue=round2(num(val('#purchaseUnitValue'))),type=val('#purchaseType'),unit=val('#purchaseUnit');
+    if(!description||quantity<=0||totalValue<0){toast('Completa descripción, cantidad y valor.','error');return}
+    state.temp.purchase.push({id:randomId('pi'),type,description,normalizedName:normalizeName(description),quantity,unit,totalValue,unitValue:unitValue||round2(totalValue/quantity)});renderPurchaseTemp();
+    $('#purchaseDescription').value='';$('#purchaseQty').value='1';$('#purchaseTotal').value='';$('#purchaseUnitValue').value='';$('#existingProductNote').textContent='';matched=null;$('#purchaseDescription').focus();
+  };
+  $('#savePurchase').onclick=savePurchase;
+};
+function renderPurchaseTemp(){
+  const list=$('#purchaseTempList'),items=state.temp.purchase,total=items.reduce((s,x)=>s+x.totalValue,0);$('#purchaseTempTotal').textContent=money(total,2);$('#savePurchase').disabled=!items.length;
+  list.innerHTML=items.length?`<div class="responsive-list">${items.map(x=>`<div class="list-card"><div class="list-head"><div><h4>${esc(x.description)}</h4><p>${itemTypeLabel(x.type)} · ${x.quantity} ${esc(x.unit)} · ${money(x.unitValue,2)} c/u</p></div><b>${money(x.totalValue,2)}</b></div><div class="list-actions"><button class="btn btn-danger btn-sm" data-remove-pi="${x.id}">Eliminar</button></div></div>`).join('')}</div>`:empty('Agrega productos a la compra.');
+  $$('[data-remove-pi]').forEach(b=>b.onclick=()=>{state.temp.purchase=items.filter(x=>x.id!==b.dataset.removePi);renderPurchaseTemp()});
+}
+async function savePurchase(){
+  const items=[...state.temp.purchase];if(!items.length)return;const btn=$('#savePurchase');btn.disabled=true;btn.textContent='Guardando…';
+  try{
+    await runTransaction(db,async tx=>{
+      const counterRef=doc(db,'counters','main'),counterSnap=await tx.get(counterRef),purchaseNo=(counterSnap.data()?.purchaseNo||0)+1;
+      const inventoryData=new Map(),productData=new Map();
+      for(const item of items.filter(x=>x.type==='sale')){
+        const key=docKey(item.description),invRef=doc(db,'inventory',key),prodRef=doc(db,'products',key);
+        if(!inventoryData.has(key)){inventoryData.set(key,{ref:invRef,snap:await tx.get(invRef)});productData.set(key,{ref:prodRef,snap:await tx.get(prodRef)})}
+      }
+      tx.set(counterRef,{purchaseNo,updatedAt:serverTimestamp()},{merge:true});const groupId=randomId('purchase');
+      for(const item of items){
+        const pRef=doc(collection(db,'purchases'));const {id:tempId,...purchaseItem}=item;tx.set(pRef,{...purchaseItem,purchaseNo,purchaseGroupId:groupId,dateKey:dateKey(),createdAt:serverTimestamp(),createdBy:state.user.uid});
+        if(item.type==='sale'){
+          const key=docKey(item.description),inv=inventoryData.get(key),prod=productData.get(key),oldInv=inv.snap.data()||{},oldProd=prod.snap.data()||{};
+          tx.set(inv.ref,{type:'sale',description:item.description,normalizedName:item.normalizedName,stock:round2(num(oldInv.stock)+item.quantity),unit:item.unit,unitCost:item.unitValue,updatedAt:serverTimestamp()},{merge:true});
+          tx.set(prod.ref,{name:item.description,normalizedName:item.normalizedName,cost:item.unitValue,pvp:num(oldProd.pvp)||0,updatedAt:serverTimestamp(),createdAt:oldProd.createdAt||serverTimestamp()},{merge:true});
+          oldInv.stock=round2(num(oldInv.stock)+item.quantity);oldInv.unitCost=item.unitValue;oldProd.cost=item.unitValue;
+        }
+      }
+    });
+    state.temp.purchase=[];toast('Compra guardada.');await navigate('purchaseEntry',true);
+  }catch(e){toast(errorText(e),'error');btn.disabled=false;btn.textContent='Guardar compra completa'}
+}
+
+renderers.purchaseHistory=async root=>{
+  const data=await getCollection('purchases',[orderBy('createdAt','desc')]);state.caches.purchases=data;
+  root.innerHTML=`${pageHead('Historial de Compras','Consulta y corrige las compras registradas')}${filterCard(`${rangeFields('ph')}<div class="field"><label>Tipo</label><select id="phType"><option value="">Todos</option>${productsEnabled()?'<option value="sale">Producto Venta</option>':''}<option value="supply">Producto Insumo</option><option value="asset">Producto Activo Fijo</option></select></div><div class="field"><label>Buscar producto</label><input id="phSearch" placeholder="Nombre del producto"></div>`)}<div class="total-box mb"><span>Total comprado según filtros</span><strong id="phTotal">${money(0,2)}</strong></div><div id="purchaseHistoryList"></div>`;
+  const apply=()=>{
+    const from=val('#phFrom'),to=val('#phTo'),type=val('#phType'),term=normalizeName(val('#phSearch'));const rows=data.filter(x=>dateRangeOk(x.dateKey,from,to)&&(!type||x.type===type)&&(!term||normalizeName(x.description).includes(term)));
+    $('#phTotal').textContent=money(rows.reduce((s,x)=>s+num(x.totalValue),0),2);$('#purchaseHistoryList').innerHTML=historyPurchaseHtml(rows);bindPurchaseHistoryActions(rows);
+  };
+  ['#phFrom','#phTo','#phType','#phSearch'].forEach(id=>$(id).addEventListener(id==='#phSearch'?'input':'change',apply));apply();
+};
+function historyPurchaseHtml(rows){
+  if(!rows.length)return `<div class="card">${empty('No hay compras para los filtros seleccionados.')}</div>`;
+  return `<div class="table-wrap desktop-table"><table class="table"><thead><tr><th>N.º</th><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Cantidad</th><th>Unitario</th><th>Total</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.purchaseNo||'—'}</td><td>${formatDateTime(x.createdAt)}</td><td>${itemTypeLabel(x.type)}</td><td>${esc(x.description)}</td><td>${x.quantity} ${esc(x.unit)}</td><td>${money(x.unitValue,2)}</td><td><b>${money(x.totalValue,2)}</b></td><td><button class="btn btn-danger btn-sm" data-delete-purchase="${x.id}">Eliminar</button></td></tr>`).join('')}</tbody></table></div>
+  <div class="mobile-list responsive-list">${rows.map(x=>`<div class="list-card"><div class="list-head"><div><h4>#${x.purchaseNo||'—'} · ${esc(x.description)}</h4><p>${formatDateTime(x.createdAt)}<br>${itemTypeLabel(x.type)} · ${x.quantity} ${esc(x.unit)}</p></div><b>${money(x.totalValue,2)}</b></div><div class="list-actions"><button class="btn btn-danger btn-sm" data-delete-purchase="${x.id}">Eliminar</button></div></div>`).join('')}</div>`;
+}
+function bindPurchaseHistoryActions(rows){
+  $$('[data-delete-purchase]').forEach(b=>b.onclick=async()=>{const item=rows.find(x=>x.id===b.dataset.deletePurchase);if(!item||!await confirmAction(`Eliminar la compra de “${item.description}”? También se descontará del inventario.`))return;
+    await runTransaction(db,async tx=>{
+      const pRef=doc(db,'purchases',item.id),pSnap=await tx.get(pRef);if(!pSnap.exists())return;
+      if(item.type==='sale'){
+        const key=docKey(item.description),invRef=doc(db,'inventory',key),invSnap=await tx.get(invRef);if(invSnap.exists())tx.update(invRef,{stock:Math.max(0,round2(num(invSnap.data().stock)-num(item.quantity))),updatedAt:serverTimestamp()});
+      }
+      tx.delete(pRef);
+    });toast('Compra eliminada.');navigate('purchaseHistory',true);
+  });
+}
+
+renderers.inventory=async root=>{
+  if(!productsEnabled()){root.innerHTML=`<div class="card">${empty('La venta de productos está desactivada.')}</div>`;return}
+  const rows=await getCollection('inventory',[orderBy('description')]);
+  root.innerHTML=`${pageHead('Inventario','Stock disponible de productos para venta')}<div class="card"><div class="table-wrap desktop-table"><table class="table"><thead><tr><th>Tipo</th><th>Descripción</th><th>Stock</th><th>Valor $</th><th>Ajustar</th><th></th></tr></thead><tbody>${rows.map(inventoryRow).join('')}</tbody></table></div><div class="mobile-list responsive-list">${rows.map(inventoryCard).join('')}</div>${rows.length?'':empty('No hay productos de venta en inventario.')}</div>`;
+  bindInventoryActions(rows);
+};
+function inventoryRow(x){return `<tr><td>Producto Venta</td><td>${esc(x.description)}</td><td><b>${num(x.stock)} ${esc(x.unit||'Und')}</b></td><td>${money(num(x.unitCost)*num(x.stock),2)}</td><td><button class="btn btn-secondary btn-sm" data-adjust-inv="${x.id}">Ajustar</button></td><td><button class="btn btn-danger btn-sm" data-delete-inv="${x.id}">Eliminar</button></td></tr>`}
+function inventoryCard(x){return `<div class="list-card"><div class="list-head"><div><h4>${esc(x.description)}</h4><p>Producto Venta · ${num(x.stock)} ${esc(x.unit||'Und')}</p></div><b>${money(num(x.unitCost)*num(x.stock),2)}</b></div><div class="list-actions"><button class="btn btn-secondary btn-sm" data-adjust-inv="${x.id}">Ajustar inventario</button><button class="btn btn-danger btn-sm" data-delete-inv="${x.id}">Eliminar</button></div></div>`}
+function bindInventoryActions(rows){
+  $$('[data-adjust-inv]').forEach(b=>b.onclick=async()=>{const x=rows.find(r=>r.id===b.dataset.adjustInv);await modal({title:'Ajustar inventario',body:`<p>Producto: <b>${esc(x.description)}</b></p><div class="field"><label>Nuevo stock</label><input id="newStock" type="number" min="0" step="0.01" value="${num(x.stock)}"></div><div class="field"><label>Motivo del ajuste</label><input id="adjustReason" placeholder="Merma, conteo físico, daño…"></div>`,confirmText:'Aplicar ajuste',danger:true,onConfirm:async root=>{const newStock=num(val('#newStock',root));if(newStock<0)return false;await updateDoc(doc(db,'inventory',x.id),{stock:newStock,lastAdjustment:{from:num(x.stock),to:newStock,reason:val('#adjustReason',root),by:state.user.uid,at:Timestamp.now()},updatedAt:serverTimestamp()});toast('Inventario ajustado.');setTimeout(()=>navigate('inventory',true),0)}})});
+  $$('[data-delete-inv]').forEach(b=>b.onclick=async()=>{const x=rows.find(r=>r.id===b.dataset.deleteInv);if(await confirmAction(`Eliminar “${x.description}” de Inventario y Productos?`)){const batch=writeBatch(db);batch.delete(doc(db,'inventory',x.id));batch.delete(doc(db,'products',x.id));await batch.commit();toast('Producto eliminado.');navigate('inventory',true)}});
+}
+
+renderers.products=async root=>{
+  if(!productsEnabled()){root.innerHTML=`<div class="card">${empty('La venta de productos está desactivada.')}</div>`;return}
+  const rows=await getCollection('products',[orderBy('name')]);state.caches.products=rows;
+  root.innerHTML=`${pageHead('Productos','Define precios de venta y revisa márgenes')}<div class="card"><div class="table-wrap desktop-table"><table class="table"><thead><tr><th>Nombre</th><th>Costo unitario</th><th>PVP</th><th>Margen $</th><th>Margen %</th><th></th></tr></thead><tbody>${rows.map(productRow).join('')}</tbody></table></div><div class="mobile-list responsive-list">${rows.map(productCard).join('')}</div>${rows.length?'':empty('Compra un Producto Venta para crearlo automáticamente.')}</div>`;
+  bindProductActions(rows);
+};
+function marginData(x){const pvp=num(x.pvp),cost=num(x.cost),m=pvp-cost,percent=pvp>0?m/pvp*100:0;return {pvp,cost,m,percent}}
+function productRow(x){const m=marginData(x);return `<tr><td>${esc(x.name)}</td><td>${money(m.cost,2)}</td><td><input class="w-auto" style="min-width:130px" data-pvp="${x.id}" type="number" min="0" step="100" value="${m.pvp}"></td><td data-margin-dollar="${x.id}">${money(m.m,2)}</td><td data-margin-percent="${x.id}">${m.percent.toFixed(1)}%</td><td><button class="btn btn-danger btn-sm" data-delete-product="${x.id}">Eliminar</button></td></tr>`}
+function productCard(x){const m=marginData(x);return `<div class="list-card"><div class="list-head"><div><h4>${esc(x.name)}</h4><p>Costo: ${money(m.cost,2)}</p></div><button class="btn btn-danger btn-sm" data-delete-product="${x.id}">Eliminar</button></div><div class="grid grid-2 mt"><div class="field"><label>PVP</label><input data-pvp="${x.id}" type="number" min="0" step="100" value="${m.pvp}"></div><div><small class="muted">Margen</small><b style="display:block" data-margin-dollar="${x.id}">${money(m.m,2)}</b><span data-margin-percent="${x.id}">${m.percent.toFixed(1)}%</span></div></div></div>`}
+function bindProductActions(rows){
+  const save=debounce(async(id,pvp)=>{await updateDoc(doc(db,'products',id),{pvp,updatedAt:serverTimestamp()});toast('PVP actualizado.')},500);
+  $$('[data-pvp]').forEach(i=>i.oninput=()=>{const x=rows.find(r=>r.id===i.dataset.pvp),pvp=num(i.value),m=pvp-num(x.cost),pct=pvp>0?m/pvp*100:0;$$(`[data-pvp="${x.id}"]`).forEach(el=>{if(el!==i)el.value=pvp});$$(`[data-margin-dollar="${x.id}"]`).forEach(el=>el.textContent=money(m,2));$$(`[data-margin-percent="${x.id}"]`).forEach(el=>el.textContent=`${pct.toFixed(1)}%`);save(x.id,pvp)});
+  $$('[data-delete-product]').forEach(b=>b.onclick=async()=>{const x=rows.find(r=>r.id===b.dataset.deleteProduct);if(await confirmAction(`Eliminar “${x.name}” de Productos e Inventario?`)){const batch=writeBatch(db);batch.delete(doc(db,'products',x.id));batch.delete(doc(db,'inventory',x.id));await batch.commit();toast('Producto eliminado.');navigate('products',true)}});
+}
+
+renderers.expenseEntry=async root=>{
+  const expenses=await getCollection('expenses',[orderBy('createdAt','desc')]);state.caches.expenses=expenses;const unique=[...new Set(expenses.map(x=>x.description))];
+  root.innerHTML=`${pageHead('Ingreso de Gastos','Registra gastos operativos de la barbería')}<div class="card" style="max-width:680px"><form id="expenseForm"><div class="field"><label>Fecha y hora</label><input value="${formatDateTime(new Date())}" disabled></div><div class="field"><label>Descripción</label><input id="expenseDescription" list="expenseSuggestions" placeholder="Ej. Servicios públicos"><datalist id="expenseSuggestions">${unique.map(x=>`<option value="${esc(x)}"></option>`).join('')}</datalist></div><div class="field"><label>Valor COP</label><input id="expenseValue" type="number" min="0" step="0.01" placeholder="0"></div><button class="btn btn-primary btn-block" type="submit">Guardar gasto</button></form></div>`;
+  $('#expenseForm').onsubmit=async e=>{e.preventDefault();const description=val('#expenseDescription'),value=round2(num(val('#expenseValue')));if(!description||value<=0){toast('Completa la descripción y un valor mayor a cero.','error');return}await addDoc(collection(db,'expenses'),{description,normalizedName:normalizeName(description),value,dateKey:dateKey(),createdAt:serverTimestamp(),createdBy:state.user.uid});e.currentTarget.reset();toast('Gasto guardado.')};
+};
+renderers.expenseHistory=async root=>{
+  const data=await getCollection('expenses',[orderBy('createdAt','desc')]);state.caches.expenses=data;
+  root.innerHTML=`${pageHead('Historial de Gastos','Consulta los egresos registrados')}${filterCard(`${rangeFields('eh')}<div class="field"><label>Buscar</label><input id="ehSearch" placeholder="Descripción"></div>`)}<div class="total-box mb"><span>Total de gastos</span><strong id="ehTotal">${money(0,2)}</strong></div><div id="expenseHistoryList"></div>`;
+  const apply=()=>{const from=val('#ehFrom'),to=val('#ehTo'),term=normalizeName(val('#ehSearch'));const rows=data.filter(x=>dateRangeOk(x.dateKey,from,to)&&(!term||normalizeName(x.description).includes(term)));$('#ehTotal').textContent=money(rows.reduce((s,x)=>s+num(x.value),0),2);$('#expenseHistoryList').innerHTML=rows.length?`<div class="responsive-list">${rows.map(x=>`<div class="list-card"><div class="list-head"><div><h4>${esc(x.description)}</h4><p>${formatDateTime(x.createdAt)}</p></div><b>${money(x.value,2)}</b></div><div class="list-actions"><button class="btn btn-danger btn-sm" data-delete-expense="${x.id}">Eliminar</button></div></div>`).join('')}</div>`:`<div class="card">${empty('No hay gastos para los filtros seleccionados.')}</div>`;$$('[data-delete-expense]').forEach(b=>b.onclick=async()=>{if(await confirmAction('¿Eliminar este gasto?')){await deleteDoc(doc(db,'expenses',b.dataset.deleteExpense));toast('Gasto eliminado.');navigate('expenseHistory',true)}})};
+  ['#ehFrom','#ehTo','#ehSearch'].forEach(id=>$(id).addEventListener(id==='#ehSearch'?'input':'change',apply));apply();
+};
+
+renderers.billing=async root=>{
+  await Promise.all([loadServices(),loadProducts(),loadClients()]);
+  const inventory=productsEnabled()?await getCollection('inventory'):[];const invMap=new Map(inventory.map(x=>[x.id,x]));const next=await getCounter('invoiceNo');state.temp.invoice=[];
+  const catalog=[...state.caches.services.map(x=>({id:x.id,name:x.name,pvp:num(x.price),kind:'service',unitCost:0})),...state.caches.products.map(x=>({id:x.id,name:x.name,pvp:num(x.pvp),kind:'product',unitCost:num(x.cost),stock:num(invMap.get(x.id)?.stock)}))];
+  root.innerHTML=`${pageHead('Facturación','Registra servicios, productos y pagos')}<div class="grid grid-2"><div class="card"><h3>Nueva factura <span class="pill pill-gold">N.º ${next}</span></h3>
+    <div class="field"><label>Cliente</label><input id="invoiceClient" list="clientSuggestions" value="General" placeholder="Buscar por nombre o celular"><datalist id="clientSuggestions">${state.caches.clients.map(x=>`<option value="${esc(x.name)}">${esc(x.phone||'')}</option>`).join('')}</datalist></div>
+    <div class="field"><label>Celular del cliente (opcional)</label><input id="invoicePhone" inputmode="tel" placeholder="300 123 4567"></div>
+    <div class="separator"></div><div class="field"><label>Producto / Servicio</label><input id="invoiceItem" list="invoiceCatalog" autocomplete="off" placeholder="Buscar producto o servicio"><datalist id="invoiceCatalog">${catalog.map(x=>`<option value="${esc(x.name)}">${x.kind==='product'?'Producto':'Servicio'}${x.kind==='product'?` · Stock ${x.stock}`:''}</option>`).join('')}</datalist><small id="invoiceItemNote"></small></div>
+    <div class="grid grid-2"><div class="field"><label>Cantidad</label><input id="invoiceQty" type="number" min="0.01" step="0.01" value="1"></div><div class="field"><label>PVP unitario</label><input id="invoicePvp" type="number" min="0" step="0.01" placeholder="0"></div></div><div class="field"><label>Total del ítem</label><input id="invoiceItemTotal" disabled value="${money(0,2)}"></div><button class="btn btn-primary btn-block" id="addInvoiceItem">＋ Agregar ítem</button>
+  </div><div class="stack"><div class="card"><div class="total-box"><span>Total de la venta</span><strong id="invoiceTotal">${money(0,2)}</strong></div><div class="separator"></div><div id="invoiceTempList">${empty('Agrega servicios o productos.')}</div></div>
+    <div class="card"><h3>Pago</h3><div class="field"><label>Forma de pago</label><select id="paymentMethod">${paymentOptions()}</select></div><label class="check-card mb"><input id="splitPayment" type="checkbox"><span>Pago dividido en dos formas</span></label><div id="splitFields" class="grid grid-2 hidden"><div><div class="field"><label>Forma 1</label><select id="paymentMethod1">${paymentOptions()}</select></div><div class="field"><label>Monto 1</label><input id="paymentAmount1" type="number" min="0" step="0.01"></div></div><div><div class="field"><label>Forma 2</label><select id="paymentMethod2">${paymentOptions('nequi')}</select></div><div class="field"><label>Monto 2</label><input id="paymentAmount2" type="number" min="0" step="0.01"></div></div></div>
+      <div class="field"><label>Monto recibido</label><input id="receivedAmount" type="number" min="0" step="0.01" placeholder="Ingresa el monto recibido"><small>El pago debe cubrir el total para registrar la venta.</small></div><div class="field"><label>Valor a devolver</label><input id="changeAmount" disabled value="${money(0,2)}"></div><button class="btn btn-success btn-block" id="saveInvoice" disabled>Guardar venta</button></div> <!-- // MODIFICADO: eliminado flujo hacia Cartera. -->
+  </div></div>`;
+  let selected=null;
+  const selectItem=()=>{selected=catalog.find(x=>normalizeName(x.name)===normalizeName(val('#invoiceItem')))||null;if(selected){$('#invoicePvp').value=selected.pvp;$('#invoiceItemNote').innerHTML=selected.kind==='product'?`Stock actual: <b>${selected.stock}</b>`:'Servicio';recalcItem()}else $('#invoiceItemNote').textContent=''};
+  const recalcItem=()=>$('#invoiceItemTotal').value=money(num(val('#invoiceQty'))*num(val('#invoicePvp')),2);
+  $('#invoiceItem').onchange=selectItem;$('#invoiceItem').onblur=selectItem;$('#invoiceQty').oninput=recalcItem;$('#invoicePvp').oninput=recalcItem;
+  $('#invoiceClient').onchange=()=>{const c=state.caches.clients.find(x=>normalizeName(x.name)===normalizeName(val('#invoiceClient')));if(c)$('#invoicePhone').value=c.phone||''};
+  $('#splitPayment').onchange=e=>$('#splitFields').classList.toggle('hidden',!e.target.checked);
+  $('#receivedAmount').oninput=()=>$('#changeAmount').value=money(Math.max(0,num(val('#receivedAmount'))-state.temp.invoice.reduce((s,x)=>s+x.total,0)),2);
+  $('#addInvoiceItem').onclick=()=>{if(!selected){toast('Selecciona un producto o servicio existente.','error');return}const quantity=num(val('#invoiceQty')),pvp=num(val('#invoicePvp'));if(quantity<=0||pvp<0){toast('Cantidad o precio no válidos.','error');return}if(selected.kind==='product'&&quantity>selected.stock){toast(`Stock insuficiente. Disponible: ${selected.stock}.`,'error');return}state.temp.invoice.push({tempId:randomId('ii'),sourceId:selected.id,name:selected.name,kind:selected.kind,quantity,pvp,total:round2(quantity*pvp),unitCost:selected.unitCost});renderInvoiceTemp();$('#invoiceItem').value='';$('#invoiceQty').value='1';$('#invoicePvp').value='';$('#invoiceItemTotal').value=money(0,2);$('#invoiceItemNote').textContent='';selected=null};
+  $('#saveInvoice').onclick=()=>saveInvoice(false);renderInvoiceTemp();
+};
+function renderInvoiceTemp(){
+  const items=state.temp.invoice,total=items.reduce((s,x)=>s+x.total,0);if($('#invoiceTotal'))$('#invoiceTotal').textContent=money(total,2);if($('#saveInvoice'))$('#saveInvoice').disabled=!items.length;
+  if($('#invoiceTempList'))$('#invoiceTempList').innerHTML=items.length?`<div class="responsive-list">${items.map(x=>`<div class="list-card"><div class="list-head"><div><h4>${esc(x.name)}</h4><p>${x.kind==='product'?'Producto':'Servicio'} · ${x.quantity} × ${money(x.pvp,2)}</p></div><b>${money(x.total,2)}</b></div><div class="list-actions"><button class="btn btn-danger btn-sm" data-remove-ii="${x.tempId}">Eliminar</button></div></div>`).join('')}</div>`:empty('Agrega servicios o productos.');
+  $$('[data-remove-ii]').forEach(b=>b.onclick=()=>{state.temp.invoice=items.filter(x=>x.tempId!==b.dataset.removeIi);renderInvoiceTemp()});
+}
+function readPayment(total){
+  const receivedRaw=val('#receivedAmount'),received=receivedRaw===''?0:num(receivedRaw),split=$('#splitPayment')?.checked;
+  let payments=split?[{method:val('#paymentMethod1'),amount:num(val('#paymentAmount1'))},{method:val('#paymentMethod2'),amount:num(val('#paymentAmount2'))}]:[{method:val('#paymentMethod'),amount:Math.min(received,total)}];
+  payments=payments.filter(x=>x.amount>0);return {received,split,payments,change:Math.max(0,received-total),balance:Math.max(0,total-received)};
+}
+async function findOrCreateClient(name,phone){
+  phone=safePhone(phone);if(!phone)return state.caches.clients.find(x=>normalizeName(x.name)===normalizeName(name))||null;
+  let c=state.caches.clients.find(x=>safePhone(x.phone)===phone);if(c)return c;
+  const ref=doc(collection(db,'clients'));await setDoc(ref,{name:name&&name!=='General'?name:`Cliente ${phone.slice(-4)}`,normalizedName:normalizeName(name&&name!=='General'?name:`Cliente ${phone.slice(-4)}`),phone,status:'General',note:'Creado automáticamente desde Facturación',dateKey:dateKey(),createdAt:serverTimestamp(),updatedAt:serverTimestamp()});c={id:ref.id,name:name&&name!=='General'?name:`Cliente ${phone.slice(-4)}`,phone};state.caches.clients.push(c);return c;
+}
+async function saveInvoice(fromAgenda=false,agendaData=null){
+  const items=fromAgenda?agendaData.items:[...state.temp.invoice],total=round2(items.reduce((s,x)=>s+x.total,0));if(!items.length)return;
+  const name=fromAgenda?agendaData.clientName:(val('#invoiceClient')||'General'),phone=fromAgenda?agendaData.phone:val('#invoicePhone');const payment=fromAgenda?agendaData.payment:readPayment(total);
+  if(payment.balance>0){toast('El monto recibido debe cubrir el total de la venta.','error');return false} // NUEVO: evita crear saldos pendientes tras eliminar Cartera.
+  if(payment.split){const sum=round2(payment.payments.reduce((s,x)=>s+x.amount,0));if(Math.abs(sum-Math.min(payment.received,total))>.01){toast('Los montos del pago dividido deben sumar el monto recibido.','error');return false}}
+  const client=await findOrCreateClient(name,phone); // MODIFICADO: se crea/consulta el cliente solo después de validar el pago completo.
+  const button=fromAgenda?null:$('#saveInvoice');if(button){button.disabled=true;button.textContent='Guardando…'}
+  try{
+    await runTransaction(db,async tx=>{
+      const counterRef=doc(db,'counters','main'),counterSnap=await tx.get(counterRef),invoiceNo=(counterSnap.data()?.invoiceNo||0)+1,saleNo=(counterSnap.data()?.saleNo||0)+1; // MODIFICADO: toda factura guardada pasa directamente a Ventas.
+      const productGroups=new Map();items.filter(x=>x.kind==='product').forEach(x=>productGroups.set(x.sourceId,round2((productGroups.get(x.sourceId)||0)+x.quantity)));
+      const invSnaps=new Map();for(const [id] of productGroups){const ref=doc(db,'inventory',id),snap=await tx.get(ref);if(!snap.exists()||num(snap.data().stock)<productGroups.get(id))throw new Error(`Stock insuficiente para ${items.find(x=>x.sourceId===id)?.name||'un producto'}.`);invSnaps.set(id,{ref,snap})}
+      tx.set(counterRef,{invoiceNo,saleNo,updatedAt:serverTimestamp()},{merge:true});
+      for(const [id,qty] of productGroups){const x=invSnaps.get(id);tx.update(x.ref,{stock:round2(num(x.snap.data().stock)-qty),updatedAt:serverTimestamp()})}
+      const cleanItems=items.map(({tempId,...x})=>x),base={invoiceNo,clientId:client?.id||'',clientName:client?.name||name||'General',phone:safePhone(phone),items:cleanItems,total,received:payment.received,change:payment.change,payments:payment.payments,dateKey:dateKey(),createdAt:serverTimestamp(),createdBy:state.user.uid,sourceAppointmentId:agendaData?.appointmentId||''};
+      const ref=doc(collection(db,'sales'));tx.set(ref,{...base,saleNo,status:'paid'}); // MODIFICADO: eliminado el destino alternativo de Cartera.
+      if(agendaData?.appointmentId){tx.delete(doc(db,'appointments',agendaData.appointmentId));(agendaData.slotKeys||[]).forEach(k=>tx.delete(doc(db,'appointmentSlots',k)))}
+    });
+    toast('Venta registrada.');if(!fromAgenda){state.temp.invoice=[];await navigate('billing',true)}return true; // MODIFICADO
+  }catch(e){toast(errorText(e),'error');if(button){button.disabled=false;button.textContent='Guardar venta'}return false}
+}
+
+renderers.sales=async root=>{
+  const data=await getCollection('sales',[orderBy('createdAt','desc')]);state.caches.sales=data;
+  root.innerHTML=`${pageHead('Ventas','Historial de ventas pagadas')}${filterCard(`${rangeFields('sf')}<div class="field"><label>Buscar cliente o ítem</label><input id="sfSearch" placeholder="Nombre, celular, servicio…"></div>`)}<div class="total-box mb"><span>Total vendido</span><strong id="salesFilteredTotal">${money(0,2)}</strong></div><div id="salesList"></div>`;
+  const apply=()=>{const from=val('#sfFrom'),to=val('#sfTo'),term=normalizeName(val('#sfSearch'));const rows=data.filter(x=>dateRangeOk(x.dateKey,from,to)&&(!term||normalizeName(`${x.clientName} ${x.phone} ${(x.items||[]).map(i=>i.name).join(' ')}`).includes(term)));$('#salesFilteredTotal').textContent=money(rows.reduce((s,x)=>s+num(x.total),0),2);$('#salesList').innerHTML=salesHtml(rows);bindSalesActions(rows)};
+  ['#sfFrom','#sfTo','#sfSearch'].forEach(id=>$(id).addEventListener(id==='#sfSearch'?'input':'change',apply));apply();
+};
+function salesHtml(rows){if(!rows.length)return `<div class="card">${empty('No hay ventas para los filtros seleccionados.')}</div>`;return `<div class="responsive-list">${rows.map(x=>`<div class="list-card"><div class="list-head"><div><h4>Factura #${x.invoiceNo||'—'} · ${esc(x.clientName||'General')}</h4><p>${formatDateTime(x.createdAt)} · ${(x.items||[]).map(i=>`${esc(i.name)} × ${i.quantity}`).join(', ')}</p></div><b>${money(x.total,2)}</b></div><div class="row-wrap mt"><span class="pill pill-success">Pagada</span>${(x.payments||[]).map(p=>statusPill(`${paymentLabel(p.method)} ${money(p.amount)}`,'info')).join('')}</div><div class="list-actions"><button class="btn btn-danger btn-sm" data-delete-sale="${x.id}">Eliminar venta</button></div></div>`).join('')}</div>`}
+function bindSalesActions(rows){
+  $$('[data-delete-sale]').forEach(b=>b.onclick=async()=>{const sale=rows.find(x=>x.id===b.dataset.deleteSale);const ok=await modal({title:'Clave de administrador',body:`<p>Para eliminar la factura #${sale.invoiceNo}, ingresa la clave administrativa.</p><div class="field"><label>Clave</label><input id="adminDeleteKey" type="password" autocomplete="off"></div>`,confirmText:'Eliminar venta',danger:true,onConfirm:async root=>{if(val('#adminDeleteKey',root)!=='avaadmin10'){toast('Clave incorrecta.','error');return false}
+      await runTransaction(db,async tx=>{const sRef=doc(db,'sales',sale.id),sSnap=await tx.get(sRef);if(!sSnap.exists())return;const groups=new Map();(sSnap.data().items||[]).filter(i=>i.kind==='product').forEach(i=>groups.set(i.sourceId,round2((groups.get(i.sourceId)||0)+num(i.quantity))));const inv=[];for(const [id] of groups){const ref=doc(db,'inventory',id),snap=await tx.get(ref);inv.push({id,ref,snap})}inv.forEach(x=>tx.set(x.ref,{stock:round2(num(x.snap.data()?.stock)+groups.get(x.id)),updatedAt:serverTimestamp()},{merge:true}));tx.delete(sRef)});toast('Venta eliminada y stock restaurado.');setTimeout(()=>navigate('sales',true),0)}});return ok});
+}
+
+// ELIMINADO: módulo Cartera completo (vista, acciones de pago y restauración asociada).
+renderers.agenda=async root=>{
+  const rows=(await getCollection('appointments',[orderBy('startsAt')])).filter(x=>x.status==='scheduled');state.caches.appointments=rows;
+  root.innerHTML=`${pageHead('Agenda','Próximas citas y acciones rápidas',`<a class="btn btn-primary" href="${esc(location.origin+'/citas-clientes')}" target="_blank"><span class="txt">Abrir enlace público</span> ↗</a>`)}<div class="responsive-list">${rows.length?rows.map(appointmentCard).join(''):empty('No hay citas agendadas.','◷')}</div>`;
+  bindAgendaActions(rows);
+  const unseen=rows.filter(x=>!x.seen);if(unseen.length){const batch=writeBatch(db);unseen.forEach(x=>batch.update(doc(db,'appointments',x.id),{seen:true,seenAt:serverTimestamp()}));await batch.commit().catch(()=>{})}
+};
+function proximity(appt){
+  const today=dateKey(),key=appt.dateKey;if(key<today)return {label:'Atrasada',type:'danger'};if(key===today)return {label:'Hoy',type:'danger'};if(key===addDays(today,1))return {label:'Mañana',type:'warning'};if(key===addDays(today,2))return {label:'Pasado mañana',type:'info'};return {label:formatDate(key),type:'gold'};
+}
+function appointmentCard(x){const p=proximity(x);return `<div class="list-card" style="border-left:4px solid var(--${p.type==='danger'?'danger':p.type==='warning'?'warning':p.type==='info'?'info':'gold'})"><div class="list-head"><div><h4>${esc(x.clientName)}</h4><p>${esc(x.phone)}<br><b class="gold">${esc(x.serviceName)}</b> · ${x.people||1} ${(x.people||1)===1?'persona':'personas'}<br>${formatDate(x.dateKey)} · ${formatClock(x.time)}</p></div>${statusPill(p.label,p.type)}</div><div class="list-actions"><button class="btn btn-secondary btn-sm" data-remind="${x.id}">WhatsApp</button><button class="btn btn-success btn-sm" data-complete="${x.id}">Servicio finalizado</button><button class="btn btn-secondary btn-sm" data-reschedule="${x.id}">Reprogramar</button><button class="btn btn-danger btn-sm" data-delete-appointment="${x.id}">Eliminar</button></div></div>`}
+function bindAgendaActions(rows){
+  $$('[data-remind]').forEach(b=>b.onclick=()=>{const x=rows.find(a=>a.id===b.dataset.remind),tpl=state.settings?.reminderMessage||'Te recordamos tu cita el {fecha} a las {hora} para {servicio}.';const msg=tpl.replaceAll('{fecha}',formatDate(x.dateKey)).replaceAll('{hora}',formatClock(x.time)).replaceAll('{servicio}',x.serviceName);window.open(`https://wa.me/${waPhone(x.phone)}?text=${encodeURIComponent(msg)}`,'_blank','noopener')});
+  $$('[data-complete]').forEach(b=>b.onclick=()=>completeAppointment(rows.find(a=>a.id===b.dataset.complete)));
+  $$('[data-reschedule]').forEach(b=>b.onclick=()=>rescheduleAppointment(rows.find(a=>a.id===b.dataset.reschedule)));
+  $$('[data-delete-appointment]').forEach(b=>b.onclick=async()=>{const x=rows.find(a=>a.id===b.dataset.deleteAppointment);if(!await confirmAction(`Eliminar la cita de ${x.clientName}?`))return;await runTransaction(db,async tx=>{tx.delete(doc(db,'appointments',x.id));(x.slotKeys||[]).forEach(k=>tx.delete(doc(db,'appointmentSlots',k)))});toast('Cita eliminada.');navigate('agenda',true)});
+}
+async function completeAppointment(appt){
+  await Promise.all([loadServices(),loadProducts()]);const inventory=productsEnabled()?await getCollection('inventory'):[],inv=new Map(inventory.map(x=>[x.id,x]));
+  const promise=modal({title:`Finalizar servicio · ${appt.clientName}`,wide:true,body:`<div class="grid grid-2"><div class="field"><label>Servicio realizado</label><select id="finishService">${state.caches.services.map(s=>`<option value="${s.id}" ${s.id===appt.serviceId?'selected':''}>${esc(s.name)} · ${money(s.price)}</option>`).join('')}</select></div><div class="field"><label>Cantidad de personas</label><input id="finishPeople" type="number" min="1" value="${appt.people||1}"></div></div>
+    ${productsEnabled()?`<div class="separator"></div><h4>Productos vendidos</h4><div class="responsive-list">${state.caches.products.length?state.caches.products.map(p=>`<label class="list-card row"><input type="checkbox" data-finish-product="${p.id}"><span style="flex:1"><b>${esc(p.name)}</b><small class="muted" style="display:block">${money(p.pvp)} · Stock ${num(inv.get(p.id)?.stock)}</small></span><input class="w-auto" style="width:85px" data-finish-qty="${p.id}" type="number" min="1" value="1" disabled></label>`).join(''):empty('No hay productos disponibles.')}</div>`:''}
+    <div class="separator"></div><div class="grid grid-2"><div class="field"><label>Forma de pago</label><select id="finishPayment">${paymentOptions()}</select></div><div class="field"><label>Monto recibido</label><input id="finishReceived" type="number" min="0" step="0.01"><small>Debe cubrir el total para finalizar el servicio.</small></div></div><div class="total-box"><span>Total a cobrar</span><strong id="finishTotal">${money(0,2)}</strong></div>`,confirmText:'Confirmar y registrar venta',onConfirm:async root=>{ // MODIFICADO: sin saldos pendientes de Cartera.
+      const service=state.caches.services.find(s=>s.id===val('#finishService',root));if(!service){toast('Selecciona un servicio.','error');return false}const people=Math.max(1,num(val('#finishPeople',root))),items=[{sourceId:service.id,name:service.name,kind:'service',quantity:people,pvp:num(service.price),total:round2(num(service.price)*people),unitCost:0}];
+      $$('[data-finish-product]:checked',root).forEach(ch=>{const p=state.caches.products.find(x=>x.id===ch.dataset.finishProduct),q=Math.max(1,num($(`[data-finish-qty="${p.id}"]`,root).value));items.push({sourceId:p.id,name:p.name,kind:'product',quantity:q,pvp:num(p.pvp),total:round2(num(p.pvp)*q),unitCost:num(p.cost)})});const total=round2(items.reduce((s,x)=>s+x.total,0)),received=val('#finishReceived',root)===''?total:num(val('#finishReceived',root)),method=val('#finishPayment',root);return saveInvoice(true,{appointmentId:appt.id,slotKeys:appt.slotKeys||[],clientName:appt.clientName,phone:appt.phone,items,payment:{received,split:false,payments:received>0?[{method,amount:Math.min(received,total)}]:[],change:Math.max(0,received-total),balance:Math.max(0,total-received)}})
+    }});
+  const recalc=()=>{const service=state.caches.services.find(s=>s.id===val('#finishService',$('#modalRoot'))),people=Math.max(1,num(val('#finishPeople',$('#modalRoot'))));let total=num(service?.price)*people;$$('[data-finish-product]:checked',$('#modalRoot')).forEach(ch=>{const p=state.caches.products.find(x=>x.id===ch.dataset.finishProduct);total+=num(p?.pvp)*Math.max(1,num($(`[data-finish-qty="${p.id}"]`,$('#modalRoot')).value))});$('#finishTotal').textContent=money(total,2);if($('#finishReceived').value==='')$('#finishReceived').value=round2(total)};
+  $('#finishService').onchange=recalc;$('#finishPeople').oninput=recalc;$$('[data-finish-product]').forEach(ch=>ch.onchange=()=>{const q=$(`[data-finish-qty="${ch.dataset.finishProduct}"]`);q.disabled=!ch.checked;recalc()});$$('[data-finish-qty]').forEach(q=>q.oninput=recalc);recalc();const ok=await promise;if(ok)navigate('agenda',true);
+}
+async function rescheduleAppointment(appt){
+  let chosen='';const max=addDays(dateKey(),Math.max(0,num(state.settings.agendaDays)||30));
+  const promise=modal({title:`Reprogramar cita · ${appt.clientName}`,body:`<div class="field"><label>Nueva fecha</label><input id="rescheduleDate" type="date" min="${dateKey()}" max="${max}" value="${appt.dateKey}"></div><button class="btn btn-secondary btn-block mb" id="loadRescheduleSlots">Consultar horarios</button><div id="rescheduleSlots">${empty('Consulta los horarios disponibles.','◷')}</div>`,confirmText:'Guardar nueva fecha',onConfirm:async root=>{
+    const newDate=val('#rescheduleDate',root);if(!chosen){toast('Selecciona un horario.','error');return false}const start=timeToMinutes(chosen),duration=Math.max(5,num(state.settings.cutDuration)||30),newKeys=slotKeys(newDate,start,appt.people||1,duration);
+    await runTransaction(db,async tx=>{for(const k of newKeys){const ref=doc(db,'appointmentSlots',k),snap=await tx.get(ref);if(snap.exists()&&!(appt.slotKeys||[]).includes(k))throw new Error('Ese horario acaba de ser reservado.');}(appt.slotKeys||[]).filter(k=>!newKeys.includes(k)).forEach(k=>tx.delete(doc(db,'appointmentSlots',k)));newKeys.forEach(k=>tx.set(doc(db,'appointmentSlots',k),{appointmentId:appt.id,dateKey:newDate,timeKey:k.slice(-4),ownerUid:appt.createdBy||state.user.uid,createdAt:serverTimestamp()}));tx.update(doc(db,'appointments',appt.id),{dateKey:newDate,time:chosen,startsAt:Timestamp.fromDate(bogotaDate(newDate,chosen)),slotKeys:newKeys,seen:false,updatedAt:serverTimestamp()})});toast('Cita reprogramada.');setTimeout(()=>navigate('agenda',true),0)
+  }});
+  const load=async()=>{const d=val('#rescheduleDate',$('#modalRoot'));if(state.settings.holidayMode&&holidayName(d)){$('#rescheduleSlots').innerHTML=empty(`Festivo: ${holidayName(d)}. No disponible.`);return}const slots=await availableSlots(d,appt.people||1,state.settings,appt.slotKeys||[]);$('#rescheduleSlots').innerHTML=slots.length?`<div class="slot-grid">${slots.map(t=>`<button class="slot" data-rslot="${t}">${formatClock(t)}</button>`).join('')}</div>`:empty('No hay horarios disponibles.');$$('[data-rslot]').forEach(b=>b.onclick=()=>{chosen=b.dataset.rslot;$$('[data-rslot]').forEach(x=>x.classList.toggle('active',x===b))})};
+  $('#loadRescheduleSlots').onclick=load;await load();await promise;
+}
+function beep(){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C(),osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=720;gain.gain.setValueAtTime(.08,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);osc.start();osc.stop(ctx.currentTime+.26)}catch{}}
+function startAppointmentListener(){
+  if(!hasSection('agenda'))return;const unsub=onSnapshot(query(collection(db,'appointments'),where('status','==','scheduled')),snap=>{const unseen=snap.docs.filter(d=>!d.data().seen).length;if(unseen>state.unseenAppointments&&state.unseenAppointments>=0)beep();state.unseenAppointments=unseen;const badge=$('#agendaBadge');if(badge){badge.textContent=unseen;badge.classList.toggle('hidden',!unseen)}},e=>console.warn('Agenda listener',e));state.listeners.push(unsub);
+}
+
+// ELIMINADO: vista Calendario mensual y todas sus funciones JS exclusivas.
+
+renderers.availability=async root=>{ // NUEVO: sección Horarios Disponibles.
+  await loadSettings();
+  const s=state.settings||defaultSettings(),today=dateKey(),max=addDays(today,Math.max(0,num(s.agendaDays)||30));
+  root.innerHTML=`${pageHead('Horarios Disponibles','Espacios que los clientes aún pueden reservar')}<div class="card" style="max-width:780px"><div class="row-wrap mb"><div class="field"><label>Fecha</label><input id="availabilityDate" type="date" min="${today}" max="${max}" value="${today}"></div><button class="btn btn-secondary" id="availabilityToday">Hoy</button></div><div id="availabilityInfo"></div><div id="availabilitySlots"></div></div>`;
+  const renderAvailable=async()=>{
+    const selectedDate=val('#availabilityDate'),info=$('#availabilityInfo'),slotsRoot=$('#availabilitySlots');
+    if(!selectedDate){info.innerHTML='';slotsRoot.innerHTML=empty('Selecciona una fecha.','◷');return}
+    slotsRoot.innerHTML=`<div class="center"><div class="loader" style="margin:auto"></div><p class="muted">Consultando horarios libres…</p></div>`;
+    if(s.holidayMode&&holidayName(selectedDate)){info.innerHTML=`<div class="mb">${statusPill(holidayName(selectedDate),'warning')}</div>`;slotsRoot.innerHTML=empty('La barbería no recibe reservas en este festivo.','◷');return}
+    let slots=await availableSlots(selectedDate,1,s); // NUEVO: reutiliza appointmentSlots; los IDs existentes se consideran ocupados.
+    if(selectedDate===dateKey()){const now=timeToMinutes(timeKey());slots=slots.filter(t=>timeToMinutes(t)>=now)} // NUEVO: oculta horas que ya pasaron hoy.
+    info.innerHTML=`<div class="row-wrap mb">${statusPill(formatDate(selectedDate),'gold')}${statusPill(`${slots.length} horarios libres`,'success')}</div>`;
+    slotsRoot.innerHTML=slots.length?`<div class="slot-grid">${slots.map(t=>`<div class="slot center">${formatClock(t)}</div>`).join('')}</div>`:empty('No quedan horarios disponibles para esta fecha.','◷');
+  };
+  $('#availabilityDate').onchange=renderAvailable;
+  $('#availabilityToday').onclick=()=>{$('#availabilityDate').value=dateKey();renderAvailable()};
+  await renderAvailable();
+};
+renderers.clients=async root=>{
+  await Promise.all([loadClients(),loadStatuses()]);const sales=await getCollection('sales',[orderBy('createdAt','desc')]);state.caches.sales=sales;
+  root.innerHTML=`${pageHead('Clientes','Base de clientes, estados y ventas por persona')}<div class="grid grid-2 mb"><div class="card"><h3>Nuevo cliente</h3><form id="clientForm"><div class="field"><label>Nombre *</label><input id="clientName" required placeholder="Nombre y apellido"></div><div class="field"><label>Celular (opcional)</label><input id="clientPhone" inputmode="tel"></div><div class="field"><label>Estado del cliente</label><select id="clientStatus"><option>General</option>${state.caches.statuses.map(x=>`<option>${esc(x.name)}</option>`).join('')}</select></div><div class="field"><label>Nota</label><textarea id="clientNote" placeholder="Preferencias, observaciones…"></textarea></div><button class="btn btn-primary btn-block" type="submit">Guardar cliente</button></form></div>
+    <div class="card"><h3>Estados personalizados</h3><form id="statusForm" class="row"><input id="statusName" placeholder="Ej. VIP, Frecuente, Nuevo"><button class="btn btn-primary" type="submit">Agregar</button></form><div class="separator"></div><div class="row-wrap" id="statusList">${state.caches.statuses.length?state.caches.statuses.map(x=>`<span class="pill pill-gold">${esc(x.name)} <button class="link-btn danger" data-delete-status="${x.id}">×</button></span>`).join(''):'<span class="muted">Aún no hay estados personalizados.</span>'}</div></div></div>
+    <div class="card mb"><div class="row-wrap"><div class="field"><label>Buscar clientes</label><input id="clientSearch" placeholder="Nombre, apellido o celular"></div></div><div class="separator"></div><div id="clientList"></div></div>
+    <div class="card"><h3>Ventas por cliente</h3><div class="row-wrap mb"><div class="field"><label>Buscar</label><input id="clientSalesSearch" placeholder="Nombre, apellido o celular"></div>${rangeFields('cs')}</div><div class="total-box mb"><span>Total encontrado</span><strong id="clientSalesTotal">${money(0,2)}</strong></div><div id="clientSalesList"></div></div>`;
+  $('#clientForm').onsubmit=async e=>{e.preventDefault();const name=val('#clientName'),phone=safePhone(val('#clientPhone'));if(!name)return;if(phone&&state.caches.clients.some(x=>safePhone(x.phone)===phone)){toast('Ya existe un cliente con ese celular.','error');return}await addDoc(collection(db,'clients'),{name,normalizedName:normalizeName(name),phone,status:val('#clientStatus')||'General',note:val('#clientNote'),dateKey:dateKey(),createdAt:serverTimestamp(),updatedAt:serverTimestamp()});toast('Cliente guardado.');navigate('clients',true)};
+  $('#statusForm').onsubmit=async e=>{e.preventDefault();const name=val('#statusName');if(!name)return;await addDoc(collection(db,'clientStatuses'),{name,normalizedName:normalizeName(name),createdAt:serverTimestamp()});toast('Estado agregado.');navigate('clients',true)};
+  $$('[data-delete-status]').forEach(b=>b.onclick=async()=>{if(await confirmAction('¿Eliminar este estado personalizado?')){await deleteDoc(doc(db,'clientStatuses',b.dataset.deleteStatus));navigate('clients',true)}});
+  const renderClients=()=>{const term=normalizeName(val('#clientSearch'));const rows=state.caches.clients.filter(x=>!term||normalizeName(`${x.name} ${x.phone}`).includes(term));$('#clientList').innerHTML=rows.length?`<div class="responsive-list">${rows.map(x=>`<div class="list-card"><div class="list-head"><div><h4>${esc(x.name)}</h4><p>${esc(x.phone||'Sin celular')} · ${esc(x.status||'General')}<br>${esc(x.note||'Sin notas')}</p></div><small class="muted">${x.createdAt?formatDate(x.createdAt):formatDate(x.dateKey)}</small></div><div class="list-actions"><button class="btn btn-secondary btn-sm" data-edit-client="${x.id}">Editar</button><button class="btn btn-danger btn-sm" data-delete-client="${x.id}">Eliminar</button></div></div>`).join('')}</div>`:empty('No se encontraron clientes.');$$('[data-edit-client]').forEach(b=>b.onclick=()=>editClient(rows.find(x=>x.id===b.dataset.editClient)));$$('[data-delete-client]').forEach(b=>b.onclick=async()=>{const x=rows.find(c=>c.id===b.dataset.deleteClient);if(await confirmAction(`Eliminar a ${x.name}? Las ventas históricas no se borrarán.`)){await deleteDoc(doc(db,'clients',x.id));toast('Cliente eliminado.');navigate('clients',true)}})};
+  $('#clientSearch').oninput=renderClients;renderClients();
+  const renderClientSales=()=>{const term=normalizeName(val('#clientSalesSearch')),from=val('#csFrom'),to=val('#csTo');const rows=sales.filter(x=>dateRangeOk(x.dateKey,from,to)&&(!term||normalizeName(`${x.clientName} ${x.phone}`).includes(term)));$('#clientSalesTotal').textContent=money(rows.reduce((s,x)=>s+num(x.total),0),2);$('#clientSalesList').innerHTML=rows.length?`<div class="responsive-list">${rows.map(x=>`<div class="list-card"><div class="list-head"><div><h4>${esc(x.clientName||'General')}</h4><p>${esc(x.phone||'')} · Factura #${x.invoiceNo}<br>${(x.items||[]).map(i=>esc(i.name)).join(', ')}</p></div><b>${money(x.total,2)}</b></div></div>`).join('')}</div>`:empty('No hay ventas para esos filtros.')};
+  ['#clientSalesSearch','#csFrom','#csTo'].forEach(id=>$(id).addEventListener(id==='#clientSalesSearch'?'input':'change',renderClientSales));renderClientSales();
+};
+async function editClient(client){
+  await modal({title:'Editar cliente',body:`<div class="field"><label>Nombre</label><input id="editClientName" value="${esc(client.name)}"></div><div class="field"><label>Celular</label><input id="editClientPhone" inputmode="tel" value="${esc(client.phone||'')}"></div><div class="field"><label>Estado</label><select id="editClientStatus"><option>General</option>${state.caches.statuses.map(x=>`<option ${x.name===client.status?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><div class="field"><label>Nota</label><textarea id="editClientNote">${esc(client.note||'')}</textarea></div>`,confirmText:'Guardar cambios',onConfirm:async root=>{const name=val('#editClientName',root);if(!name)return false;await updateDoc(doc(db,'clients',client.id),{name,normalizedName:normalizeName(name),phone:safePhone(val('#editClientPhone',root)),status:val('#editClientStatus',root)||'General',note:val('#editClientNote',root),updatedAt:serverTimestamp()});toast('Cliente actualizado.');setTimeout(()=>navigate('clients',true),0)}})
+}
+
+renderers.dashboard=async root=>{
+  const [sales,purchases,expenses,clients]=await Promise.all([
+    getCollection('sales',[orderBy('createdAt','desc')]),getCollection('purchases',[orderBy('createdAt','desc')]),getCollection('expenses',[orderBy('createdAt','desc')]),getCollection('clients')
+  ]);state.caches.sales=sales;state.caches.purchases=purchases;state.caches.expenses=expenses;state.caches.clients=clients;
+  root.innerHTML=`${pageHead('Dashboard','Resumen financiero y comercial')}${filterCard(`${rangeFields('df')}<button class="btn btn-secondary" id="dashboardToday">Hoy</button><button class="btn btn-secondary" id="dashboardMonth">Este mes</button>`)}<div id="dashboardContent"></div>`;
+  const apply=()=>renderDashboardData(sales,purchases,expenses,val('#dfFrom'),val('#dfTo'));
+  $('#dfFrom').onchange=apply;$('#dfTo').onchange=apply;$('#dashboardToday').onclick=()=>{$('#dfFrom').value=$('#dfTo').value=dateKey();apply()};$('#dashboardMonth').onclick=()=>{$('#dfFrom').value=`${currentMonthKey()}-01`;$('#dfTo').value=dateKey();apply()};apply();
+};
+function renderDashboardData(sales,purchases,expenses,from,to){
+  const fs=sales.filter(x=>dateRangeOk(x.dateKey,from,to)),fp=purchases.filter(x=>dateRangeOk(x.dateKey,from,to)),fe=expenses.filter(x=>dateRangeOk(x.dateKey,from,to));
+  const salesTotal=fs.reduce((s,x)=>s+num(x.total),0),purchaseTotal=fp.reduce((s,x)=>s+num(x.totalValue),0),expenseTotal=fe.reduce((s,x)=>s+num(x.value),0),net=salesTotal-purchaseTotal-expenseTotal;
+  const services=new Map(),products=new Map(),customers=new Map(),payments=new Map();let productCost=0,productRevenue=0;
+  fs.forEach(s=>{customers.set(s.clientName||'General',(customers.get(s.clientName||'General')||0)+num(s.total));(s.items||[]).forEach(i=>{const map=i.kind==='product'?products:services;const prev=map.get(i.name)||{qty:0,value:0};prev.qty+=num(i.quantity);prev.value+=num(i.total);map.set(i.name,prev);if(i.kind==='product'){productCost+=num(i.unitCost)*num(i.quantity);productRevenue+=num(i.total)}});(s.payments||[]).forEach(p=>payments.set(paymentLabel(p.method),(payments.get(paymentLabel(p.method))||0)+num(p.amount)))});
+  const monthlySales=sales.filter(x=>x.dateKey?.startsWith(currentMonthKey())).reduce((s,x)=>s+num(x.total),0),goal=Math.max(1,num(state.settings?.monthlyGoal)||1),progress=Math.min(100,monthlySales/goal*100),productProfit=productRevenue-productCost,productPct=productRevenue>0?productProfit/productRevenue*100:0;
+  $('#dashboardContent').innerHTML=`<div class="grid grid-4 mb"><div class="card stat"><div class="k">Ventas</div><div class="v success">${money(salesTotal,2)}</div><div class="hint">${fs.length} registros pagados</div></div><div class="card stat"><div class="k">Compras</div><div class="v">${money(purchaseTotal,2)}</div><div class="hint">Inventario, insumos y activos</div></div><div class="card stat"><div class="k">Gastos</div><div class="v">${money(expenseTotal,2)}</div><div class="hint">Gastos operativos</div></div><div class="card stat"><div class="k">Utilidad neta</div><div class="v ${net>=0?'success':'danger'}">${money(net,2)}</div><div class="hint">Ventas − Compras − Gastos</div></div></div>
+    <div class="grid grid-2 mb"><div class="card"><h3>Meta mensual</h3><div class="row"><strong style="font-size:24px">${money(monthlySales)}</strong><span class="muted" style="margin-left:auto">de ${money(goal)}</span></div><div class="progress mt"><span style="width:${progress}%"></span></div><p class="muted">${progress.toFixed(1)}% completado en ${formatMonth(currentMonthKey())}.</p></div>
+      ${productsEnabled()?`<div class="card"><h3>Rentabilidad de productos</h3><div class="grid grid-2"><div><small class="muted">Costo vendido</small><b style="display:block">${money(productCost,2)}</b></div><div><small class="muted">Venta productos</small><b style="display:block">${money(productRevenue,2)}</b></div><div><small class="muted">Utilidad</small><b class="success" style="display:block">${money(productProfit,2)}</b></div><div><small class="muted">Margen</small><b style="display:block">${productPct.toFixed(1)}%</b></div></div></div>`:`<div class="card"><h3>Modelo de negocio</h3><p class="muted">La venta de productos está desactivada. El dashboard se concentra en servicios.</p></div>`}
+    </div>
+    <div class="grid grid-2 mb"><div class="card"><h3>Ranking de servicios</h3>${rankHtml(services)}</div><div class="card"><h3>Top 10 clientes</h3>${rankHtml(new Map([...customers.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>[k,{qty:0,value:v}])))}</div></div>
+    ${productsEnabled()?`<div class="card mb"><h3>Ranking de productos</h3><div class="carousel">${[...products.entries()].sort((a,b)=>b[1].value-a[1].value).map(([name,v],i)=>`<div class="card"><span class="pill pill-gold">#${i+1}</span><h4 class="mt">${esc(name)}</h4><p class="muted">${v.qty} unidades</p><b style="font-size:22px">${money(v.value,2)}</b></div>`).join('')||empty('No hay ventas de productos en el periodo.')}</div></div>`:''}
+    <div class="card"><h3>Ventas por forma de pago</h3>${rankHtml(new Map([...payments.entries()].map(([k,v])=>[k,{qty:0,value:v}])))}</div>`;
+}
+function rankHtml(map){const rows=[...map.entries()].sort((a,b)=>num(b[1]?.value??b[1])-num(a[1]?.value??a[1]));if(!rows.length)return empty('Sin datos para el periodo.');const max=Math.max(...rows.map(x=>num(x[1]?.value??x[1])),1);return `<div class="rank">${rows.map(([name,v],i)=>{const value=num(v?.value??v),qty=num(v?.qty);return `<div class="rank-item"><b>${i+1}. ${esc(name)}</b><div class="bar"><span style="width:${value/max*100}%"></span></div><div class="right"><b>${money(value)}</b>${qty?`<small style="display:block">${qty} vendidos</small>`:''}</div></div>`}).join('')}</div>`}
+function formatMonth(key){const [y,m]=key.split('-').map(Number);return new Intl.DateTimeFormat('es-CO',{month:'long',year:'numeric',timeZone:BOGOTA_TZ}).format(new Date(Date.UTC(y,m-1,15,17)))}
+
+async function profileWithRetry(uid){
+  for(let i=0;i<20;i++){const snap=await getDoc(doc(db,'users',uid));if(snap.exists())return {id:snap.id,...snap.data()};await sleep(250)}return null;
+}
+function cleanupListeners(){state.listeners.forEach(fn=>{try{fn()}catch{}});state.listeners=[];state.unseenAppointments=0}
+function installManifest(){
+  const manifest={name:'AVA · Gestión para Barberías',short_name:'AVA',start_url:location.pathname,display:'standalone',background_color:'#0f0d0b',theme_color:'#0f0d0b',icons:[]};
+  const link=document.createElement('link');link.rel='manifest';link.href=`data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;document.head.append(link);
+}
+installManifest();
+setInterval(()=>{const s=$('#topSubtitle');if(s)s.textContent=`Hora de Bogotá · ${timeKey()}`},30000);
+
+if(PUBLIC_PATH){publicBookingApp()}
+else onAuthStateChanged(auth,async user=>{
+  cleanupListeners();setLoading(true);
+  try{
+    if(!user){state.user=null;state.profile=null;state.settings=null;authView('login');return}
+    if(user.isAnonymous){await signOut(auth);authView('login');return}
+    const profile=await profileWithRetry(user.uid);if(!profile||profile.active===false){toast('Esta cuenta no tiene acceso activo al sistema.','error');await signOut(auth);return}
+    state.user=user;state.profile=profile;await ensureSettings();
+    const last=localStorage.getItem('ava-last-section')||'dashboard';state.activeSection=hasSection(last)?last:getMenuOrder()[0]||'dashboard';
+    appShell();startAppointmentListener();
+  }catch(e){console.error(e);toast(errorText(e),'error');if(auth.currentUser)await signOut(auth)}finally{setLoading(false)}
+});
+
+</script>
+
+<!--
+===============================================================================
+AVA — REGLAS DE SEGURIDAD SUGERIDAS PARA CLOUD FIRESTORE
+Pega este bloque en Firebase Console > Firestore Database > Rules y publícalo.
+Activa en Authentication los proveedores Email/Password y Anónimo.
+Para producción, activa Firebase App Check y prueba estas reglas en Emulator Suite.
+===============================================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function userRef() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+    function userData() {
+      return get(userRef()).data;
+    }
+    function active() {
+      return signedIn() && exists(userRef()) && userData().active != false;
+    }
+    function admin() {
+      return active() && userData().role == 'Administrador';
+    }
+    function allowed(sections) {
+      return active() && (admin() || userData().enabledSections.hasAny(sections));
+    }
+    function firstAdminAfterWrite() {
+      return signedIn()
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Administrador';
+    }
+
+    match /settings/main {
+      allow read: if allowed(['settings']);
+      allow create: if signedIn() && !exists(/databases/$(database)/documents/settings/main) && firstAdminAfterWrite();
+      allow update: if allowed(['settings']);
+      allow delete: if admin();
+    }
+
+    match /publicSettings/main {
+      allow read: if true;
+      allow create: if signedIn() && !exists(/databases/$(database)/documents/publicSettings/main) && firstAdminAfterWrite();
+      allow update: if allowed(['settings']);
+      allow delete: if admin();
+    }
+
+    match /users/{uid} {
+      allow create: if admin() || (
+        signedIn()
+        && uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/settings/main)
+        && request.resource.data.role == 'Administrador'
+      );
+      allow read: if active() && (uid == request.auth.uid || admin());
+      allow update, delete: if admin();
+    }
+
+    match /services/{id} {
+      allow read: if true;
+      allow create, update, delete: if allowed(['settings']);
+    }
+
+    match /appointments/{id} {
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'scheduled'
+        && request.resource.data.seen == false
+        && request.resource.data.clientName is string
+        && request.resource.data.phone is string;
+      allow read: if allowed(['agenda']); // MODIFICADO: eliminado permiso exclusivo de Calendario.
+      allow update, delete: if allowed(['agenda']);
+    }
+
+    match /appointmentSlots/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && !exists(/databases/$(database)/documents/appointmentSlots/$(id))
+        && (request.resource.data.ownerUid == request.auth.uid || allowed(['agenda']));
+      allow update, delete: if allowed(['agenda']);
+    }
+
+    match /purchases/{id} {
+      allow read: if allowed(['purchaseEntry', 'purchaseHistory', 'inventory', 'products', 'dashboard']);
+      allow create: if allowed(['purchaseEntry']);
+      allow update, delete: if allowed(['purchaseHistory']);
+    }
+
+    match /inventory/{id} {
+      allow read: if allowed(['inventory', 'products', 'billing', 'agenda', 'dashboard', 'sales']); // MODIFICADO: eliminado Cartera.
+      allow create, update: if allowed(['purchaseEntry', 'inventory', 'products', 'billing', 'agenda', 'sales']); // MODIFICADO: eliminado Cartera.
+      allow delete: if allowed(['inventory', 'products']);
+    }
+
+    match /products/{id} {
+      allow read: if allowed(['products', 'inventory', 'billing', 'agenda', 'dashboard', 'sales']); // MODIFICADO: eliminado Cartera.
+      allow create, update: if allowed(['purchaseEntry', 'products']);
+      allow delete: if allowed(['products', 'inventory']);
+    }
+
+    match /expenses/{id} {
+      allow read: if allowed(['expenseEntry', 'expenseHistory', 'dashboard']);
+      allow create: if allowed(['expenseEntry']);
+      allow update, delete: if allowed(['expenseHistory']);
+    }
+
+    match /sales/{id} {
+      allow read: if allowed(['sales', 'dashboard', 'clients']);
+      allow create: if allowed(['billing', 'agenda']); // MODIFICADO: ventas ya no se originan desde Cartera.
+      allow update: if admin();
+      allow delete: if admin();
+    }
+
+    // ELIMINADO: reglas exclusivas de la colección funcional de Cartera.
+
+    match /clients/{id} {
+      allow read: if allowed(['clients', 'billing', 'agenda', 'dashboard']);
+      allow create, update: if allowed(['clients', 'billing', 'agenda']);
+      allow delete: if allowed(['clients']);
+    }
+
+    match /clientStatuses/{id} {
+      allow read: if allowed(['clients']);
+      allow create, update, delete: if allowed(['clients']);
+    }
+
+    match /counters/{id} {
+      allow read, create, update: if allowed(['purchaseEntry', 'billing', 'agenda']); // MODIFICADO: eliminado Cartera.
+      allow delete: if admin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+===============================================================================
+NOTAS DE DESPLIEGUE PARA CONSERVAR UN SOLO HTML
+- Publica este archivo como index.html o configura una reescritura de Hosting para
+  que /citas-clientes entregue el mismo HTML.
+- Las notificaciones incluidas son en tiempo real, con badge y sonido mientras la
+  aplicación está abierta. El push en segundo plano exige un service worker HTTPS
+  separado y un emisor confiable (Cloud Functions o servidor), por lo que no cabe
+  literalmente dentro de un único HTML estático.
+- Crear usuarios sí funciona desde el panel mediante una instancia secundaria de
+  Firebase Auth. Eliminar una cuenta de Authentication de otro usuario requiere
+  Firebase Admin SDK; esta versión elimina su perfil autorizado, por lo que las
+  reglas bloquean el acceso aunque la credencial de Auth quede huérfana.
+===============================================================================
+-->
+</body>
+</html>
