@@ -99,9 +99,9 @@
     /* Dashboard */
     .profit-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.profit-main{position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between}.profit-main:after{content:"";position:absolute;width:250px;height:250px;border:1px solid rgba(224,180,109,.12);border-radius:50%;right:-80px;top:-90px;box-shadow:0 0 0 35px rgba(224,180,109,.025),0 0 0 70px rgba(224,180,109,.018)}.profit-main>*{position:relative;z-index:1}.profit-number{font-family:Oswald;font-size:clamp(2.7rem,6vw,5.3rem);line-height:1;margin:12px 0}.equation{display:flex;gap:8px;flex-wrap:wrap}.equation span{padding:7px 9px;border-radius:9px;background:#111113;border:1px solid var(--line-soft);font-size:.7rem;color:#bcb8b1}.progress-track{height:12px;border-radius:999px;background:#0d0d0f;border:1px solid var(--line);overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent-3),var(--accent-2));border-radius:inherit;transition:width .4s ease}.rank-list{display:flex;flex-direction:column;gap:9px}.rank-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line-soft);border-radius:12px;background:#111113}.rank-index{width:28px;height:28px;border-radius:9px;background:#1e1e22;display:grid;place-items:center;font-family:Oswald;color:var(--accent-2)}.rank-name{font-size:.77rem;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-value{font-size:.74rem;color:#d4d0c8;font-weight:800}.bar-row{display:grid;grid-template-columns:115px minmax(80px,1fr) auto;gap:10px;align-items:center;margin:11px 0}.bar-label{font-size:.72rem;color:#bbb7b0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar-track{height:8px;border-radius:99px;background:#0d0d0f;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent-3),var(--accent-2));border-radius:inherit}.bar-value{font-size:.69rem;color:var(--muted)}
 
-    /* MODIFICADO: esta zona queda exclusivamente para Agenda. */
+    /* Agenda // MODIFICADO: se elimina el CSS exclusivo del Calendario mensual */
     .appointment-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.appointment-card{position:relative;overflow:hidden;border:1px solid var(--line-soft);border-radius:17px;padding:17px;background:#141416}.appointment-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--day-color,var(--accent))}.appointment-top{display:flex;justify-content:space-between;gap:12px}.appointment-time{font-family:Oswald;font-size:1.45rem;color:var(--day-color,var(--accent-2))}.appointment-date{font-size:.68rem;color:var(--muted);margin-top:3px}.appointment-name{font-size:1rem;font-weight:850;margin:14px 0 4px}.appointment-service{font-size:.76rem;color:#c1bdb5}.appointment-meta{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.appointment-actions{display:flex;gap:7px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--line-soft)}
-    /* ELIMINADO: estilos exclusivos de la vista Calendario mensual. */
+    /* // ELIMINADO: .calendar-shell, .calendar-grid, .calendar-day y estilos asociados */
 
     /* Public booking */
     .public-shell{min-height:100vh;padding:18px;background:
@@ -178,11 +178,11 @@
     const NAV_ITEMS = [
       {id:"dashboard",label:"Dashboard",icon:"chart",section:"Visión general",subtitle:"Utilidad, metas y rendimiento"},
       {id:"appointments",label:"Agenda",icon:"calendarCheck",section:"Operación",subtitle:"Turnos próximos y atención",badge:true},
-      // MODIFICADO: Calendario se reemplaza por una vista exclusiva de horarios aún libres.
-      {id:"available-slots",label:"Horarios Disponibles",icon:"calendar",section:"Operación",subtitle:"Horarios libres para reservar"},
+      // NUEVO: reemplaza la vista mensual de Calendario por una vista exclusiva de espacios libres.
+      {id:"availability",label:"Horarios Disponibles",icon:"calendar",section:"Operación",subtitle:"Turnos libres para reservar"},
       {id:"billing",label:"Facturación",icon:"receipt",section:"Operación",subtitle:"Servicios, productos y cobros"},
       {id:"sales",label:"Ventas",icon:"coins",section:"Operación",subtitle:"Historial de ventas cerradas"},
-      // ELIMINADO: entrada de navegación del módulo Cartera.
+      // ELIMINADO: entradas de navegación "Calendario" y "Cartera".
       {id:"purchases",label:"Ingreso de compras",icon:"cartPlus",section:"Compras e inventario",subtitle:"Registrar compras por comprobante"},
       {id:"purchase-history",label:"Historial de compras",icon:"history",section:"Compras e inventario",subtitle:"Consultar y depurar compras"},
       {id:"inventory",label:"Inventario",icon:"boxes",section:"Compras e inventario",subtitle:"Existencias de productos de venta",requiresProducts:true},
@@ -205,8 +205,8 @@
     const state = {
       user:null, profile:null, config:structuredClone(DEFAULT_CONFIG), activeView:"dashboard",
       activeUnsubs:[], globalUnsubs:[], viewSeq:0, notificationCount:0, notificationCounter:0, notificationInitialized:false,
-      // MODIFICADO: se elimina calendarCursor y se agrega solo el estado requerido por Horarios Disponibles.
-      purchaseDraft:[], invoiceDraft:[], availableSlotLocks:[],
+      purchaseDraft:[], invoiceDraft:[], // MODIFICADO: calendarCursor eliminado junto con Calendario mensual.
+      availabilityLocks:[], // NUEVO: bloqueos existentes usados para calcular solo horarios libres.
       purchaseSuggestions:[], expenseSuggestions:[], services:[], products:[], clients:[],
       public:{step:1,service:null,people:1,date:null,time:null,slotLocks:[],unsubs:[]},
       dashboardData:{sales:[],purchases:[],expenses:[],monthSales:[]}
@@ -328,21 +328,11 @@
     function clearPublicListeners(){ state.public.unsubs.splice(0).forEach(fn=>{try{fn?.()}catch{}}); }
     function listenActive(unsub){ state.activeUnsubs.push(unsub); return unsub; }
 
-    // NUEVO: normaliza permisos/menuOrder antiguos sin modificar automáticamente los documentos existentes.
-    function normalizeNavigationIds(ids=[]){
-      const migrated=ids.map(id=>id==="calendar"?"available-slots":id).filter(id=>id!=="receivables");
-      if(migrated.includes("appointments")&&!migrated.includes("available-slots")){
-        migrated.splice(migrated.indexOf("appointments")+1,0,"available-slots");
-      }
-      return [...new Set(migrated)].filter(id=>NAV_ITEMS.some(n=>n.id===id));
-    }
-
     function availableNav(){
-      // MODIFICADO: los perfiles antiguos con Agenda/Calendario conservan acceso a Horarios Disponibles.
-      const rawAllowed=state.profile?.role==="Administrador"?ALL_PERMISSIONS:(state.profile?.permissions||[]);
-      const allowed=state.profile?.role==="Administrador"?ALL_PERMISSIONS:normalizeNavigationIds(rawAllowed);
-      const rawOrder=state.profile?.menuOrder?.length?state.profile.menuOrder:ALL_PERMISSIONS;
-      const order=normalizeNavigationIds(rawOrder);
+      const allowed=state.profile?.role==="Administrador"?ALL_PERMISSIONS:(state.profile?.permissions||[]);
+      // MODIFICADO: descarta IDs eliminados del menuOrder guardado y agrega módulos nuevos al final del orden.
+      const savedOrder=(state.profile?.menuOrder||[]).filter(id=>NAV_ITEMS.some(n=>n.id===id));
+      const order=[...savedOrder,...ALL_PERMISSIONS.filter(id=>!savedOrder.includes(id))];
       return order.map(id=>NAV_ITEMS.find(n=>n.id===id)).filter(Boolean).filter(n=>allowed.includes(n.id)).filter(n=>!n.requiresProducts||state.config.catalog.sellsProducts);
     }
     function hasAccess(id){ return availableNav().some(n=>n.id===id); }
@@ -440,8 +430,8 @@
     });
 
     const VIEW_RENDERERS={
-      // MODIFICADO: se eliminan Cartera/Calendario y se registra Horarios Disponibles.
-      dashboard:renderDashboard,purchases:renderPurchases,"purchase-history":renderPurchaseHistory,inventory:renderInventory,products:renderProducts,expenses:renderExpenses,"expense-history":renderExpenseHistory,billing:renderBilling,sales:renderSales,appointments:renderAppointments,"available-slots":renderAvailableSlots,clients:renderClients,settings:renderSettings
+      // MODIFICADO: se eliminan renderReceivables/renderCalendar y se registra la nueva vista.
+      dashboard:renderDashboard,purchases:renderPurchases,"purchase-history":renderPurchaseHistory,inventory:renderInventory,products:renderProducts,expenses:renderExpenses,"expense-history":renderExpenseHistory,billing:renderBilling,sales:renderSales,appointments:renderAppointments,availability:renderAvailability,clients:renderClients,settings:renderSettings
     };
     async function renderActiveView(){
       const seq=++state.viewSeq;const container=$("#viewContainer");container.innerHTML=loadingRows(4);try{await VIEW_RENDERERS[state.activeView]?.();}catch(err){if(seq!==state.viewSeq)return;container.innerHTML=pageHead("Error","No fue posible cargar esta sección",firebaseMessage(err))+`<div class="card">${emptyState("Revisa la configuración",firebaseMessage(err),"alert")}</div>`;console.error(err)}
@@ -535,8 +525,11 @@
     }
 
     async function openUserEditor(existing=null){
-      // MODIFICADO: elimina permisos legacy y usa Horarios Disponibles en lugar de Calendario.
-      const isEdit=!!existing;const role=existing?.role||"Trabajador";const order=normalizeNavigationIds(existing?.menuOrder?.length?existing.menuOrder:ALL_PERMISSIONS);const defaultWorkerPermissions=["dashboard","appointments","available-slots","billing","sales","clients"];const permissionSource=existing?(existing.permissions||defaultWorkerPermissions):defaultWorkerPermissions;const permissions=role==="Administrador"?ALL_PERMISSIONS:normalizeNavigationIds(permissionSource);
+      const isEdit=!!existing;const role=existing?.role||"Trabajador";
+      // MODIFICADO: limpia permisos/orden de módulos eliminados y garantiza que "Horarios Disponibles" aparezca en el editor.
+      const savedOrder=(existing?.menuOrder?.length?existing.menuOrder:ALL_PERMISSIONS).filter(id=>NAV_ITEMS.some(n=>n.id===id));
+      const order=[...savedOrder,...ALL_PERMISSIONS.filter(id=>!savedOrder.includes(id))];
+      const permissions=role==="Administrador"?ALL_PERMISSIONS:(existing?.permissions||["dashboard","appointments","availability","billing","sales","clients"]).filter(id=>NAV_ITEMS.some(n=>n.id===id));
       const body=`<div class="form-grid"><div class="field col-6"><label>Nombre</label><input id="userEditName" value="${esc(existing?.name||"")}" placeholder="Juan Pérez"></div><div class="field col-6"><label>Correo</label><input id="userEditEmail" type="email" value="${esc(existing?.email||"")}" placeholder="barbero@negocio.com" ${isEdit?"readonly":""}></div>${isEdit?"":`<div class="field col-6"><label>Contraseña inicial</label><input id="userEditPassword" type="password" minlength="6" placeholder="Mínimo 6 caracteres"></div>`}<div class="field col-6"><label>Rol</label><select id="userEditRole"><option ${role==="Trabajador"?"selected":""}>Trabajador</option><option ${role==="Administrador"?"selected":""}>Administrador</option></select></div><div class="field col-12"><div class="switch-row"><div class="switch-copy"><b>Usuario activo</b><span>Al desactivarlo no podrá entrar al panel.</span></div><label class="switch"><input id="userEditActive" type="checkbox" ${existing?.active===false?"":"checked"}><span class="switch-slider"></span></label></div></div><div class="field col-12"><label>Acceso y orden del menú</label><small>Marca las secciones permitidas y arrastra para cambiar el orden.</small><div id="permissionDragList" class="drag-list">${order.map(id=>{const n=navItem(id);return `<div class="drag-item" draggable="true" data-permission-id="${id}"><span class="drag-handle">⋮⋮</span><input type="checkbox" ${permissions.includes(id)?"checked":""}><span>${icon(n.icon)} ${esc(n.label)}</span></div>`}).join("")}</div></div></div>`;
       const modalPromise=openModal({title:isEdit?"Editar usuario":"Crear usuario",subtitle:isEdit?"Actualiza rol, permisos y orden del menú.":"La contraseña se guarda únicamente en Firebase Authentication.",body,confirmText:isEdit?"Guardar cambios":"Crear usuario",large:true,onConfirm:async layer=>{
         const name=$("#userEditName",layer).value.trim(),email=$("#userEditEmail",layer).value.trim(),newRole=$("#userEditRole",layer).value,active=$("#userEditActive",layer).checked,items=$$('[data-permission-id]',layer),menuOrder=items.map(x=>x.dataset.permissionId),selected=items.filter(x=>$("input",x).checked).map(x=>x.dataset.permissionId),finalPermissions=newRole==="Administrador"?ALL_PERMISSIONS:selected;
@@ -679,19 +672,18 @@
     }
     function renderExpenseHistoryRows(){const el=$("#expenseHistoryList");if(!el)return;const search=normalize($("#expenseHistorySearch")?.value||"");const data=(state.expenseHistory||[]).filter(x=>!search||normalize(x.description).includes(search));$("#expenseFilteredTotal").textContent=money(data.reduce((a,x)=>a+(x.value||0),0));$("#expenseFilteredCount").textContent=data.length;if(!data.length){el.innerHTML=emptyState("No hay gastos para mostrar","Ajusta el rango o la búsqueda.","fileMinus");return}el.innerHTML=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Valor</th><th>Registrado por</th><th></th></tr></thead><tbody>${data.map(x=>`<tr><td>${formatTimestamp(x.createdAt)}</td><td class="cell-main">${esc(x.description)}</td><td class="cell-main">${money(x.value)}</td><td>${esc(x.createdBy?.name||"")}</td><td><button class="btn btn-danger btn-sm" data-expense-delete="${x.id}">${icon("trash")} Eliminar</button></td></tr>`).join("")}</tbody></table></div>`;$$('[data-expense-delete]',el).forEach(b=>b.onclick=async()=>{const x=data.find(i=>i.id===b.dataset.expenseDelete);if(await confirmModal("Eliminar gasto",`Se eliminará “${x.description}” por ${money(x.value)}.`)){try{await deleteDoc(doc(db,"expenses",x.id));toast("Gasto eliminado")}catch(err){toast("No se pudo eliminar","error",firebaseMessage(err))}}})}
 
-    // MODIFICADO: módulo Cartera eliminado del flujo de facturación.
     /* =========================================================
-       Facturación y ventas
+       Facturación y ventas // MODIFICADO: módulo Cartera eliminado
        ========================================================= */
     async function renderBilling(){
       const next=await nextCounter("invoices");
       state.invoiceDraft=[];
-      // MODIFICADO: Facturación ya no deriva cuentas pendientes a Cartera.
-      $("#viewContainer").innerHTML=pageHead("Operación","Facturación","Registra servicios y productos y controla el pago de cada venta.")+`<div class="section-stack"><div class="card card-accent"><div class="card-head"><div><h3 class="card-title">Factura N.º <span id="invoiceNumber">${next}</span></h3><div class="card-sub">Fecha y hora de Bogotá: <span data-live-now>${nowBogotaLabel()}</span></div></div><div class="card-icon">${icon("receipt")}</div></div>
+      // MODIFICADO: Facturación ya no deriva ventas pendientes a Cartera.
+      $("#viewContainer").innerHTML=pageHead("Operación","Facturación","Registra servicios y productos, controla el pago y guarda únicamente ventas cerradas.")+`<div class="section-stack"><div class="card card-accent"><div class="card-head"><div><h3 class="card-title">Factura N.º <span id="invoiceNumber">${next}</span></h3><div class="card-sub">Fecha y hora de Bogotá: <span data-live-now>${nowBogotaLabel()}</span></div></div><div class="card-icon">${icon("receipt")}</div></div>
         <div class="form-grid"><div class="field col-6"><label>Cliente</label><input id="billingClient" list="billingClientList" value="General" placeholder="General" autocomplete="off"><datalist id="billingClientList"></datalist></div><div class="field col-6"><label>Celular del cliente (opcional)</label><input id="billingPhone" inputmode="tel" placeholder="300 000 0000"></div></div>
       </div><div class="card"><div class="card-head"><div><h3 class="card-title">Agregar producto o servicio</h3><div class="card-sub">Busca por nombre exacto para cargar el PVP automáticamente.</div></div></div><form id="billingItemForm" class="form-grid"><div class="field col-6"><label>Producto / Servicio</label><input id="billingItemSearch" list="billingItemList" placeholder="Corte clásico" autocomplete="off" required><datalist id="billingItemList"></datalist><small id="billingItemHint">Catálogo de servicios${state.config.catalog.sellsProducts?" y productos":""}.</small></div><div class="field col-2"><label>Cantidad</label><input id="billingQty" type="number" min="1" step="1" value="1" required></div><div class="field col-2"><label>PVP unitario</label><div class="input-prefix"><span>$</span><input id="billingUnitPrice" type="number" min="0" step="0.01" readonly value="0"></div></div><div class="field col-2"><label>Total</label><div class="input-prefix"><span>$</span><input id="billingItemTotal" type="number" readonly value="0"></div></div><div class="col-12 form-actions" style="margin-top:0"><button class="btn btn-primary" type="submit">${icon("plus")} Agregar ítem</button></div></form></div>
       <div class="card"><div class="card-head"><div><h3 class="card-title">Venta en curso</h3><div class="card-sub">Confirma los ítems y define cómo se recibió el pago.</div></div></div><div id="invoiceDraft"></div><div class="draft-total"><span>Total de la venta</span><b id="invoiceDraftTotal">${money(0)}</b></div><div class="section-divider"></div>
-        <div class="form-grid"><div class="field col-4"><label>Forma de pago</label><select id="billingPaymentMethod">${["Efectivo","Nequi","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-4"><label>Monto recibido</label><div class="input-prefix"><span>$</span><input id="billingReceived" type="number" min="0" step="0.01" placeholder="Ingresa el monto recibido"></div><small>El monto recibido debe cubrir el total de la venta.</small></div><div class="field col-4"><label>Valor a devolver</label><div class="input-prefix"><span>$</span><input id="billingChange" readonly value="0"></div></div><div class="field col-12"><label style="display:flex;align-items:center;gap:8px"><input id="splitPaymentToggle" type="checkbox" style="width:auto;accent-color:var(--accent)"> Pago dividido</label></div><div id="splitPaymentFields" class="col-12 form-grid" style="display:none"><div class="field col-3"><label>Medio 1</label><select id="splitMethod1">${["Efectivo","Nequi","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-3"><label>Monto 1</label><input id="splitAmount1" type="number" min="0" step="0.01" placeholder="0"></div><div class="field col-3"><label>Medio 2</label><select id="splitMethod2">${["Nequi","Efectivo","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-3"><label>Monto 2</label><input id="splitAmount2" type="number" min="0" step="0.01" placeholder="0"></div></div></div>
+        <div class="form-grid"><div class="field col-4"><label>Forma de pago</label><select id="billingPaymentMethod">${["Efectivo","Nequi","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-4"><label>Monto recibido</label><div class="input-prefix"><span>$</span><input id="billingReceived" type="number" min="0" step="0.01" placeholder="Ingresa el monto recibido"></div><small>El pago debe cubrir el total para registrar la venta.</small></div><div class="field col-4"><label>Valor a devolver</label><div class="input-prefix"><span>$</span><input id="billingChange" readonly value="0"></div></div><div class="field col-12"><label style="display:flex;align-items:center;gap:8px"><input id="splitPaymentToggle" type="checkbox" style="width:auto;accent-color:var(--accent)"> Pago dividido</label></div><div id="splitPaymentFields" class="col-12 form-grid" style="display:none"><div class="field col-3"><label>Medio 1</label><select id="splitMethod1">${["Efectivo","Nequi","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-3"><label>Monto 1</label><input id="splitAmount1" type="number" min="0" step="0.01" placeholder="0"></div><div class="field col-3"><label>Medio 2</label><select id="splitMethod2">${["Nequi","Efectivo","Transferencia","Tarjeta"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field col-3"><label>Monto 2</label><input id="splitAmount2" type="number" min="0" step="0.01" placeholder="0"></div></div></div>
         <div class="form-actions"><button id="clearInvoiceDraft" class="btn btn-ghost">Limpiar</button><button id="saveInvoiceBtn" class="btn btn-primary">${icon("save")} Guardar venta</button></div>
       </div></div>`;
       renderInvoiceDraft();
@@ -714,23 +706,19 @@
 
     async function saveInvoice(){
       if(!state.invoiceDraft.length)return;
-
-      // MODIFICADO: al eliminar Cartera, toda factura debe registrar un pago completo para convertirse en venta.
       const total=invoiceTotal(),clientName=$("#billingClient").value.trim()||"General",phone=$("#billingPhone").value.trim(),split=$("#splitPaymentToggle").checked,receivedRaw=$("#billingReceived").value.trim();
-      let paymentDetails=[],received=0;
-
+      let paymentDetails=[],received=0; // MODIFICADO: se elimina el estado de deuda/Cartera.
       if(split){
         const a1=round2($("#splitAmount1").value),a2=round2($("#splitAmount2").value);received=round2(a1+a2);
         if(a1<=0||a2<=0||Math.abs(received-total)>.01){toast("Los pagos divididos deben sumar el total","error");return}
         paymentDetails=[{method:$("#splitMethod1").value,amount:a1},{method:$("#splitMethod2").value,amount:a2}];
       }else{
-        // NUEVO: evita crear cuentas pendientes invisibles después de eliminar el módulo Cartera.
-        if(receivedRaw===""){toast("Ingresa el monto recibido","error","La venta debe quedar pagada para poder guardarse.");return}
+        // MODIFICADO: sin Cartera, una factura solo puede guardarse cuando el pago cubre el total.
+        if(receivedRaw===""){toast("Ingresa el monto recibido","error","La venta debe quedar pagada para poder registrarse.");return}
         received=round2(receivedRaw);
-        if(received<total){toast("El monto recibido no puede ser menor al total","error");return}
+        if(received<total){toast("El monto recibido no puede ser menor al total","error","Completa el pago antes de guardar la venta.");return}
         paymentDetails=[{method:$("#billingPaymentMethod").value,amount:total}];
       }
-
       const btn=$("#saveInvoiceBtn");setBusy(btn,true,"Registrando...");
       try{
         let invoiceNumber=0;const items=state.invoiceDraft.map(x=>({...x}));
@@ -747,11 +735,11 @@
           invRefs.forEach((r,index)=>tx.update(r,{stock:round2((invSnaps[index].data().stock||0)-productGroups.get(r.id)),updatedAt:serverTimestamp()}));
           if(clientRef){const savedName=clientName==="General"?"Cliente":clientName;tx.set(clientRef,{name:savedName,normalizedName:normalize(savedName),phone,normalizedPhone:phoneDigits(phone),active:true,updatedAt:serverTimestamp(),createdAt:clientSnap?.data()?.createdAt||serverTimestamp()},{merge:true})}
           const base={invoiceNumber,client:{id:clientId,name:clientName,phone},items,total,dateKey:todayKey(),createdAt:serverTimestamp(),createdBy:{uid:state.user.uid,name:state.profile.name},source:"Facturación"};
-          // MODIFICADO: todas las facturas guardadas se escriben directamente en la colección existente "sales".
+          // MODIFICADO: toda factura válida se registra directamente como venta cerrada.
           tx.set(doc(collection(db,"sales")),{...base,amountReceived:received,change:round2(Math.max(0,received-total)),paymentDetails,status:"closed"});
         });
         state.invoiceDraft=[];renderInvoiceDraft();$("#billingClient").value="General";$("#billingPhone").value="";$("#billingReceived").value="";$("#splitPaymentToggle").checked=false;$("#splitPaymentFields").style.display="none";$("#invoiceNumber").textContent=invoiceNumber+1;
-        toast("Venta registrada","success",`Factura N.º ${invoiceNumber}`);
+        toast("Venta registrada","success",`Factura N.º ${invoiceNumber}`); // MODIFICADO
       }catch(err){toast("No se pudo registrar la factura","error",firebaseMessage(err))}finally{setBusy(btn,false)}
     }
 
@@ -762,7 +750,7 @@
     function renderSalesRows(){const el=$("#salesList");if(!el)return;const s=normalize($("#salesSearch")?.value||"");const data=(state.salesHistory||[]).filter(v=>!s||normalize(`${v.client?.name||""} ${v.client?.phone||""} ${(v.items||[]).map(i=>i.name).join(" ")}`).includes(s));const total=data.reduce((a,x)=>a+(x.total||0),0);$("#salesFilteredTotal").textContent=money(total);$("#salesFilteredCount").textContent=data.length;$("#salesAverage").textContent=money(data.length?total/data.length:0);if(!data.length){el.innerHTML=emptyState("No hay ventas para mostrar","Ajusta las fechas o la búsqueda.","coins");return}el.innerHTML=`<div class="section-stack">${data.map(v=>`<div class="card" style="padding:15px"><div class="card-head" style="margin-bottom:12px"><div><div class="cell-main">Factura N.º ${esc(v.invoiceNumber)} · ${esc(v.client?.name||"General")}</div><div class="cell-sub">${formatTimestamp(v.createdAt)} · ${esc(v.client?.phone||"Sin celular")}</div></div><div style="display:flex;align-items:center;gap:8px"><b>${money(v.total)}</b><button class="btn btn-danger btn-sm" data-sale-delete="${v.id}">${icon("trash")} Eliminar</button></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">${(v.items||[]).map(i=>`<span class="tag ${i.itemType==="Producto"?"tag-gold":"tag-blue"}">${esc(i.name)} × ${i.quantity} · ${money(i.total)}</span>`).join("")}</div><div class="cell-sub">Pago: ${(v.paymentDetails||[]).map(p=>`${esc(p.method)} ${money(p.amount)}`).join(" + ")||"—"}${v.change?` · Cambio: ${money(v.change)}`:""}</div></div>`).join("")}</div>`;$$('[data-sale-delete]',el).forEach(b=>b.onclick=()=>deleteSale(b.dataset.saleDelete))}
     async function deleteSale(id){const sale=(state.salesHistory||[]).find(x=>x.id===id);if(!sale)return;const code=await promptModal({title:"Clave requerida",subtitle:`Para eliminar la factura N.º ${sale.invoiceNumber}, escribe la clave preventiva.`,label:"Clave",password:true,confirmText:"Validar"});if(code!==SALES_DELETE_CODE){if(code!==false)toast("Clave incorrecta","error");return}if(!await confirmModal("Eliminar venta",`Se eliminará la factura N.º ${sale.invoiceNumber} y se devolverán al inventario los productos vendidos.`))return;try{await runTransaction(db,async tx=>{const ref=doc(db,"sales",id),snap=await tx.get(ref);if(!snap.exists())return;const groups=new Map();for(const i of (snap.data().items||[]).filter(x=>x.itemType==="Producto"))groups.set(i.catalogId,(groups.get(i.catalogId)||0)+i.quantity);const refs=[...groups.keys()].map(pid=>doc(db,"inventory",pid)),snaps=await Promise.all(refs.map(r=>tx.get(r)));refs.forEach((r,idx)=>{if(snaps[idx].exists())tx.update(r,{stock:round2((snaps[idx].data().stock||0)+groups.get(r.id)),updatedAt:serverTimestamp()})});tx.delete(ref)});toast("Venta eliminada")}catch(err){toast("No se pudo eliminar la venta","error",firebaseMessage(err))}}
 
-    // ELIMINADO: módulo Cartera, su listener y sus acciones de cobro/anulación.
+    // ELIMINADO: renderReceivables, renderReceivableRows, payReceivable y cancelReceivable.
 
     /* =========================================================
        Agendamiento público
@@ -863,30 +851,30 @@
       await promise;
     }
 
-    // ELIMINADO: vista mensual, renderer, listeners y utilidades exclusivas de Calendario.
     /* =========================================================
-       Horarios disponibles
+       Horarios disponibles // NUEVO
        ========================================================= */
-    async function renderAvailableSlots(){
-      // NUEVO: usa el mismo rango configurado para la agenda pública.
+    async function renderAvailability(){
       const start=todayKey(),days=Math.max(1,Number(state.config.logistics.agendaDays||30)),end=addDaysKey(start,days);
-      $("#viewContainer").innerHTML=pageHead("Operación","Horarios Disponibles","Consulta únicamente los horarios que todavía pueden reservarse según la agenda actual.")+`<div class="card"><div class="card-head"><div><h3 class="card-title">Del ${formatDateKey(start,{day:"2-digit",month:"short"})} al ${formatDateKey(end,{day:"2-digit",month:"short",year:"numeric"})}</h3><div class="card-sub">Duración base: ${state.config.logistics.averageDuration} minutos · Los horarios ocupados no se muestran.</div></div><div class="card-icon">${icon("calendarCheck")}</div></div><div id="availableSlotsList">${loadingRows(6)}</div></div>`;
-
-      // NUEVO: slotLocks es la fuente existente que el sistema usa para excluir turnos ya reservados.
+      // NUEVO: esta vista usa la misma colección slotLocks que ya protege las reservas públicas.
+      $("#viewContainer").innerHTML=pageHead("Operación","Horarios Disponibles","Muestra únicamente los turnos que todavía no han sido reservados por los clientes.")+`<div class="card"><div class="card-head"><div><h3 class="card-title">Disponibilidad actual</h3><div class="card-sub">Desde ${formatDateKey(start)} hasta ${formatDateKey(end)} · Turnos base de ${state.config.logistics.averageDuration} minutos.</div></div><div class="card-icon">${icon("calendar")}</div></div><div id="availabilityContent">${loadingRows(6)}</div></div>`;
       listenActive(onSnapshot(query(collection(db,"slotLocks"),where("date",">=",start),where("date","<=",end),orderBy("date")),snap=>{
-        state.availableSlotLocks=snap.docs.map(d=>({id:d.id,...d.data()}));
-        renderAvailableSlotCards();
-      },err=>$("#availableSlotsList").innerHTML=emptyState("No se pudieron cargar los horarios",firebaseMessage(err),"alert")));
+        state.availabilityLocks=snap.docs.map(d=>({id:d.id,...d.data()})); // NUEVO
+        renderAvailabilityList(start,end);
+      },err=>$("#availabilityContent").innerHTML=emptyState("No se pudieron cargar los horarios",firebaseMessage(err),"alert")));
+      // NUEVO: refresca el día actual para ocultar automáticamente horas que ya quedaron en el pasado.
+      const refreshTimer=setInterval(()=>renderAvailabilityList(start,end),60000);
+      listenActive(()=>clearInterval(refreshTimer));
     }
 
-    function renderAvailableSlotCards(){
-      // NUEVO: agrupa las reservas existentes por fecha y muestra solamente los inicios libres.
-      const el=$("#availableSlotsList");if(!el)return;
-      const start=todayKey(),days=Math.max(1,Number(state.config.logistics.agendaDays||30)),locksByDate=new Map();
-      for(const lock of state.availableSlotLocks||[]){if(!locksByDate.has(lock.date))locksByDate.set(lock.date,[]);locksByDate.get(lock.date).push(lock)}
-      const availableDays=Array.from({length:days+1},(_,i)=>addDaysKey(start,i)).map(date=>({date,slots:availableStartSlots(date,1,locksByDate.get(date)||[],state.config)})).filter(x=>x.slots.length);
-      if(!availableDays.length){el.innerHTML=emptyState("No hay horarios disponibles","Todos los horarios del período permitido ya están ocupados, cerrados o quedaron en el pasado.","calendarCheck");return}
-      el.innerHTML=`<div class="grid grid-2">${availableDays.map(day=>`<div class="card" style="padding:16px"><div class="card-head" style="margin-bottom:12px"><div><div class="cell-main">${formatDateKey(day.date,{weekday:"long",day:"2-digit",month:"long"})}</div><div class="cell-sub">${day.slots.length} horario${day.slots.length===1?"":"s"} disponible${day.slots.length===1?"":"s"}</div></div><span class="tag tag-green">Disponible</span></div><div style="display:flex;gap:8px;flex-wrap:wrap">${day.slots.map(m=>`<span class="tag tag-green">${humanTime(timeFromMinutes(m))}</span>`).join("")}</div></div>`).join("")}</div>`;
+    function renderAvailabilityList(start=todayKey(),end=addDaysKey(todayKey(),Math.max(1,Number(state.config.logistics.agendaDays||30)))){
+      const el=$("#availabilityContent");if(!el)return;
+      const locksByDate=new Map();
+      for(const lock of state.availabilityLocks||[]){if(!locksByDate.has(lock.date))locksByDate.set(lock.date,[]);locksByDate.get(lock.date).push(lock)}
+      // NUEVO: availableStartSlots excluye cualquier startMinute presente en slotLocks y respeta jornada, almuerzo, festivos y hora actual.
+      const availableDays=rangeDays(start,end).map(key=>({key,slots:availableStartSlots(key,1,locksByDate.get(key)||[],state.config)})).filter(day=>day.slots.length);
+      if(!availableDays.length){el.innerHTML=emptyState("No quedan horarios disponibles","Todos los turnos del rango configurado están ocupados o ya pasaron.","calendar");return}
+      el.innerHTML=`<div class="section-stack">${availableDays.map(day=>{const diff=dayDiff(day.key,todayKey());return `<div class="card" style="padding:16px"><div class="card-head" style="margin-bottom:12px"><div><div class="cell-main">${appointmentDayLabel(diff)} · ${formatDateKey(day.key)}</div><div class="cell-sub">${day.slots.length} horario${day.slots.length===1?"":"s"} disponible${day.slots.length===1?"":"s"}</div></div><span class="tag tag-green">Disponible</span></div><div style="display:flex;gap:8px;flex-wrap:wrap">${day.slots.map(m=>`<span class="tag tag-green">${humanTime(timeFromMinutes(m))}</span>`).join("")}</div></div>`}).join("")}</div>`;
     }
 
     /* =========================================================
@@ -925,8 +913,8 @@
     function renderDashboardMetrics(){
       const {sales,purchases,expenses,monthSales}=state.dashboardData,serviceRevenue=sales.reduce((a,s)=>a+(s.items||[]).filter(i=>i.itemType==="Servicio").reduce((x,i)=>x+(i.total||0),0),0),productRevenue=sales.reduce((a,s)=>a+(s.items||[]).filter(i=>i.itemType==="Producto").reduce((x,i)=>x+(i.total||0),0),0),purchaseTotal=purchases.reduce((a,p)=>a+(p.total||0),0),expenseTotal=expenses.reduce((a,e)=>a+(e.value||0),0),net=serviceRevenue+productRevenue-purchaseTotal-expenseTotal,productCost=sales.reduce((a,s)=>a+(s.items||[]).filter(i=>i.itemType==="Producto").reduce((x,i)=>x+(i.costUnitAtSale||0)*(i.quantity||0),0),0),productProfit=productRevenue-productCost,productPct=productRevenue?productProfit/productRevenue*100:0,serviceRank=aggregateItems(sales,"Servicio"),productRank=aggregateItems(sales,"Producto"),goal=Number(state.config.dashboard.monthlyGoal||0),monthRevenue=monthSales.reduce((a,s)=>a+(s.total||0),0),progress=goal?Math.min(100,monthRevenue/goal*100):0;
       const clientMap=new Map();for(const s of sales){const key=s.client?.id||phoneDigits(s.client?.phone)||normalize(s.client?.name||"General"),x=clientMap.get(key)||{name:s.client?.name||"General",phone:s.client?.phone||"",total:0};x.total+=s.total||0;clientMap.set(key,x)}const topClients=[...clientMap.values()].sort((a,b)=>b.total-a.total).slice(0,10),payMap=new Map();for(const s of sales)for(const p of s.paymentDetails||[])payMap.set(p.method,(payMap.get(p.method)||0)+(p.amount||0));const payments=[...payMap.entries()].map(([name,total])=>({name,total})).sort((a,b)=>b.total-a.total),maxPay=Math.max(1,...payments.map(x=>x.total));
-      // MODIFICADO: el Dashboard ya no depende ni menciona el módulo eliminado.
-      $("#dashboardContent").innerHTML=`<div class="section-stack"><div class="profit-hero"><div class="card card-accent profit-main"><div><div class="eyebrow">Utilidad neta del rango</div><div class="profit-number ${net>=0?"success-text":"danger-text"}">${money(net)}</div><div class="equation"><span>Servicios ${money(serviceRevenue)}</span><span>+ Productos ${money(productRevenue)}</span><span>− Compras ${money(purchaseTotal)}</span><span>− Gastos ${money(expenseTotal)}</span></div></div><div class="cell-sub">Solo incluye ventas cerradas dentro del rango seleccionado.</div></div><div class="card"><div class="card-head"><div><h3 class="card-title">Meta del mes</h3><div class="card-sub">Ventas cerradas del mes actual.</div></div><div class="card-icon">${icon("chart")}</div></div><div class="metric-value">${money(monthRevenue)}</div><div class="progress-track" style="margin:13px 0"><div class="progress-fill" style="width:${progress}%"></div></div><div style="display:flex;justify-content:space-between;gap:10px"><span class="cell-sub">${numberCO(progress)}% de ${money(goal)}</span><button id="editMonthlyGoal" class="btn btn-ghost btn-sm">${icon("edit")} Cambiar meta</button></div></div></div>
+      // MODIFICADO: el Dashboard ya no referencia cuentas pendientes de Cartera.
+      $("#dashboardContent").innerHTML=`<div class="section-stack"><div class="profit-hero"><div class="card card-accent profit-main"><div><div class="eyebrow">Utilidad neta del rango</div><div class="profit-number ${net>=0?"success-text":"danger-text"}">${money(net)}</div><div class="equation"><span>Servicios ${money(serviceRevenue)}</span><span>+ Productos ${money(productRevenue)}</span><span>− Compras ${money(purchaseTotal)}</span><span>− Gastos ${money(expenseTotal)}</span></div></div><div class="cell-sub">Solo incluye ventas cerradas registradas en el sistema.</div></div><div class="card"><div class="card-head"><div><h3 class="card-title">Meta del mes</h3><div class="card-sub">Ventas cerradas del mes actual.</div></div><div class="card-icon">${icon("chart")}</div></div><div class="metric-value">${money(monthRevenue)}</div><div class="progress-track" style="margin:13px 0"><div class="progress-fill" style="width:${progress}%"></div></div><div style="display:flex;justify-content:space-between;gap:10px"><span class="cell-sub">${numberCO(progress)}% de ${money(goal)}</span><button id="editMonthlyGoal" class="btn btn-ghost btn-sm">${icon("edit")} Cambiar meta</button></div></div></div>
       <div class="grid grid-4"><div class="metric"><div class="metric-label">Ventas totales</div><div class="metric-value">${money(serviceRevenue+productRevenue)}</div><div class="metric-foot">${sales.length} facturas cerradas</div></div><div class="metric"><div class="metric-label">Compras</div><div class="metric-value">${money(purchaseTotal)}</div><div class="metric-foot">${purchases.length} comprobantes</div></div><div class="metric"><div class="metric-label">Gastos</div><div class="metric-value">${money(expenseTotal)}</div><div class="metric-foot">${expenses.length} registros</div></div><div class="metric"><div class="metric-label">Ticket promedio</div><div class="metric-value">${money(sales.length?(serviceRevenue+productRevenue)/sales.length:0)}</div><div class="metric-foot">Promedio por factura</div></div></div>
       ${state.config.catalog.sellsProducts?`<div class="grid grid-4"><div class="metric"><div class="metric-label">Costo productos vendidos</div><div class="metric-value">${money(productCost)}</div></div><div class="metric"><div class="metric-label">Venta de productos</div><div class="metric-value">${money(productRevenue)}</div></div><div class="metric"><div class="metric-label">Utilidad productos</div><div class="metric-value ${productProfit>=0?"success-text":"danger-text"}">${money(productProfit)}</div></div><div class="metric"><div class="metric-label">Margen productos</div><div class="metric-value ${productPct>=0?"success-text":"danger-text"}">${numberCO(productPct)}%</div></div></div>`:""}
       <div class="grid grid-2"><div class="card"><div class="card-head"><div><h3 class="card-title">Ranking de servicios</h3><div class="card-sub">Ordenado por valor vendido.</div></div></div>${rankHtml(serviceRank,"No hay servicios vendidos")}</div>${state.config.catalog.sellsProducts?`<div class="card"><div class="card-head"><div><h3 class="card-title">Ranking de productos</h3><div class="card-sub">Contenedor desplazable para catálogos extensos.</div></div></div><div style="max-height:390px;overflow:auto">${rankHtml(productRank,"No hay productos vendidos")}</div></div>`:`<div class="card"><div class="card-head"><div><h3 class="card-title">Desglose por forma de pago</h3></div></div>${paymentHtml(payments,maxPay)}</div>`}</div>
@@ -1035,7 +1023,7 @@ service cloud.firestore {
         ) || (
           counterId == 'purchases' && canAny(['purchases'])
         ) || (
-          counterId == 'invoices' && canAny(['billing','appointments']) // MODIFICADO: Cartera eliminada
+          counterId == 'invoices' && canAny(['billing','appointments']) // MODIFICADO: receivables eliminado
         ) || (
           counterId == 'appointmentNotifications' && canAny(['appointments'])
         );
